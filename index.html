@@ -1,0 +1,386 @@
+<meta charset="utf-8">
+<title>Prompt 逆推场</title>
+<style>
+:root{
+  --bg:#FFFFFF; --ink:#111111; --muted:#6B6B6B; --line:#DADADA;
+  --good:#1A7F37; --warn:#9A6700; --bad:#C62828;
+  --sans:-apple-system,"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121212; --ink:#EDEDED; --muted:#9A9A9A; --line:#333333; --good:#56C271; --warn:#E0A93B; --bad:#F27B7B;
+}}
+:root[data-theme="dark"]{
+  --bg:#121212; --ink:#EDEDED; --muted:#9A9A9A; --line:#333333; --good:#56C271; --warn:#E0A93B; --bad:#F27B7B;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:clamp(17px,1.3vw,24px)/1.65 var(--sans);padding-inline:clamp(20px,2.5vw,48px);padding-block:24px 32px}
+main{min-height:100%;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.muted{color:var(--muted)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.top{position:relative;z-index:11;display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 28px;margin-bottom:32px}
+.top h1{font-size:1em;font-weight:700;margin:0}
+#nav{display:flex;gap:20px;flex:1}
+#nav button{padding-bottom:2px;border-bottom:2px solid transparent;color:var(--muted)}
+#nav button[aria-current="true"]{color:var(--ink);border-color:var(--ink)}
+
+.stage{display:grid;grid-template-columns:1fr 1fr;flex:1}
+.stage>div{min-width:0}
+.stage>div:first-child{padding-right:24px}
+.stage>div:last-child{padding-left:24px;border-left:1px solid var(--line)}
+.label{font-size:.7em;color:var(--muted);margin-bottom:8px}
+.content{white-space:pre-wrap;overflow-wrap:anywhere;font-size:clamp(20px,1.8vw,34px);line-height:1.7}
+.content.mono{font-family:var(--mono);font-size:clamp(17px,1.5vw,28px)}
+.content svg,.content img{display:block;width:100%;height:auto;max-height:48vh;object-fit:contain}
+
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:0 48px}
+.pair>div{min-width:0}
+#answers{margin-top:36px}
+#answers .who{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+#answers label{font-weight:700}
+#answers .primary{margin-top:12px}
+textarea:disabled{opacity:.55}
+#shade{position:fixed;inset:0;z-index:10;display:grid;place-items:center;background:color-mix(in srgb,var(--bg) 85%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+#shade .primary{font-size:clamp(28px,3vw,52px);padding:.5em 1.6em}
+textarea{display:block;width:100%;min-height:22vh;resize:vertical;padding:10px 12px;border:1px solid var(--ink);border-radius:0;background:var(--bg);color:var(--ink);font:1em/1.6 var(--mono)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;margin-top:12px}
+.primary{background:var(--ink);color:var(--bg);padding:8px 20px;font-weight:700}
+.primary:disabled{opacity:.4}
+.link{text-decoration:underline;text-underline-offset:3px}
+
+#results{margin-top:36px;padding-top:20px;border-top:1px solid var(--line)}
+#reveal{width:min(900px,calc(100vw - 40px));max-height:calc(100vh - 80px);overflow:auto;margin:auto;padding:clamp(24px,3vw,48px);border:1px solid var(--ink);background:var(--bg);color:var(--ink)}
+#reveal::backdrop{background:rgba(0,0,0,.6)}
+#reveal .head{display:flex;justify-content:space-between;align-items:baseline;gap:20px}
+#origPrompt{font-size:clamp(20px,1.8vw,32px)!important}
+.score{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 28px}
+.score b{font:700 clamp(44px,4.5vw,80px)/1 var(--mono);font-variant-numeric:tabular-nums}
+ul{list-style:none;margin:16px 0 0;padding:0}
+li{display:flex;gap:10px;padding-block:3px}
+li .mark{flex:none;width:1.2em;font-weight:700}
+.hit{color:var(--good)} .near{color:var(--warn)} .miss{color:var(--bad)}
+.note{margin:14px 0 0;color:var(--muted)}
+#origPrompt{font:1em/1.7 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0 0}
+#refList li{font:.85em/1.6 var(--mono);color:var(--muted);overflow-wrap:anywhere}
+
+
+@media (max-width:680px){
+  .stage{grid-template-columns:1fr}
+  .pair{grid-template-columns:1fr;gap:24px}
+  .stage>div:first-child{padding-right:0}
+  .stage>div:last-child{padding-left:0;border-left:none;border-top:1px solid var(--line);margin-top:20px;padding-top:20px}
+}
+</style>
+
+<main>
+  <div class="top">
+    <h1>Prompt 逆推场</h1>
+    <div id="nav"></div>
+    <span class="muted" id="engine" style="font-size:.7em"></span>
+    <span class="muted num" id="totalScore"></span>
+  </div>
+
+  <div class="stage">
+    <div><div class="label">输入</div><div class="content" id="leftPane"></div></div>
+    <div><div class="label">输出</div><div class="content" id="rightPane"></div></div>
+  </div>
+
+  <div class="pair" id="answers">
+    <div>
+      <div class="who"><label for="guessA">学生 A</label><span class="muted num" id="timeA"></span></div>
+      <textarea id="guessA"></textarea>
+      <button class="primary" id="submitA">提交</button>
+    </div>
+    <div>
+      <div class="who"><label for="guessB">学生 B</label><span class="muted num" id="timeB"></span></div>
+      <textarea id="guessB"></textarea>
+      <button class="primary" id="submitB">提交</button>
+    </div>
+  </div>
+
+  <div class="pair" id="results" hidden>
+    <div id="resA"></div>
+    <div id="resB"></div>
+  </div>
+
+  <dialog id="reveal">
+    <div class="head"><div class="label">原 prompt</div><button class="link" id="closeReveal">关闭</button></div>
+    <p id="origPrompt"></p>
+    <ul id="revealEls"></ul>
+    <div class="label" style="margin-top:20px">同样算对的写法</div>
+    <ul id="refList" style="margin-top:0"></ul>
+  </dialog>
+</main>
+
+<div id="shade"><button class="primary" id="startBtn">开始</button></div>
+
+<!-- 占位图：之后可以在题库里用 leftImg / rightImg 换成真实图片的 URL 或 data URI -->
+<template id="svg-house-day"><svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="220" fill="#9fd3f5"/><circle cx="262" cy="46" r="24" fill="#ffd44d"/><ellipse cx="80" cy="50" rx="34" ry="12" fill="#fff"/><ellipse cx="170" cy="32" rx="26" ry="9" fill="#fff"/><rect y="160" width="320" height="60" fill="#6cbf5a"/><rect x="110" y="100" width="110" height="80" fill="#e8c9a0"/><polygon points="98,102 165,52 232,102" fill="#b5482f"/><rect x="155" y="135" width="24" height="45" fill="#6b4226"/><rect x="122" y="115" width="24" height="22" fill="#4a6d8c"/><rect x="188" y="115" width="24" height="22" fill="#4a6d8c"/><rect x="52" y="120" width="10" height="50" fill="#6b4226"/><circle cx="57" cy="108" r="26" fill="#3f9142"/></svg></template>
+<template id="svg-house-night"><svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="220" fill="#101c3d"/><circle cx="262" cy="46" r="24" fill="#f4f1d8"/><g fill="#fff"><circle cx="40" cy="30" r="1.6"/><circle cx="95" cy="60" r="1.2"/><circle cx="140" cy="22" r="1.6"/><circle cx="200" cy="48" r="1.2"/><circle cx="300" cy="100" r="1.4"/><circle cx="20" cy="90" r="1.2"/></g><rect y="160" width="320" height="60" fill="#e9eef5"/><rect x="110" y="100" width="110" height="80" fill="#8f7c66"/><polygon points="98,102 165,52 232,102" fill="#6b2f22"/><polygon points="98,102 165,52 232,102 222,102 165,62 108,102" fill="#f4f7fb"/><rect x="155" y="135" width="24" height="45" fill="#3f2716"/><rect x="122" y="115" width="24" height="22" fill="#ffcf5a"/><rect x="188" y="115" width="24" height="22" fill="#ffcf5a"/><rect x="52" y="120" width="10" height="50" fill="#3f2716"/><circle cx="57" cy="108" r="26" fill="#24502b"/><path d="M33 100a26 26 0 0 1 48 0z" fill="#f4f7fb"/><g fill="#fff" opacity=".9"><circle cx="30" cy="140" r="2.4"/><circle cx="75" cy="70" r="2.4"/><circle cx="120" cy="40" r="2"/><circle cx="150" cy="90" r="2.4"/><circle cx="210" cy="75" r="2"/><circle cx="245" cy="120" r="2.4"/><circle cx="285" cy="150" r="2"/><circle cx="180" cy="20" r="2.4"/><circle cx="95" cy="150" r="2"/><circle cx="270" cy="85" r="2"/></g></svg></template>
+<template id="svg-cat-flat"><svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="220" fill="#f3e6cf"/><ellipse cx="160" cy="196" rx="80" ry="8" fill="#d9c7a6"/><path d="M215 180c40 0 44-50 20-58" fill="none" stroke="#e8893a" stroke-width="12" stroke-linecap="round"/><ellipse cx="160" cy="150" rx="52" ry="46" fill="#e8893a"/><circle cx="160" cy="84" r="34" fill="#e8893a"/><polygon points="132,66 136,34 156,56" fill="#e8893a"/><polygon points="188,66 184,34 164,56" fill="#e8893a"/><circle cx="148" cy="82" r="4" fill="#2b2118"/><circle cx="172" cy="82" r="4" fill="#2b2118"/><polygon points="156,92 164,92 160,98" fill="#c45a5a"/><ellipse cx="160" cy="160" rx="24" ry="28" fill="#fbe3c4"/></svg></template>
+<template id="svg-cat-blueprint"><svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="220" fill="#1c4a9a"/><g stroke="#ffffff" stroke-opacity=".18" stroke-width="1"><path d="M0 20H320M0 40H320M0 60H320M0 80H320M0 100H320M0 120H320M0 140H320M0 160H320M0 180H320M0 200H320"/><path d="M20 0V220M40 0V220M60 0V220M80 0V220M100 0V220M120 0V220M140 0V220M160 0V220M180 0V220M200 0V220M220 0V220M240 0V220M260 0V220M280 0V220M300 0V220"/></g><g fill="none" stroke="#fff" stroke-width="2"><path d="M215 180c40 0 44-50 20-58" stroke-linecap="round"/><ellipse cx="160" cy="150" rx="52" ry="46"/><circle cx="160" cy="84" r="34"/><polygon points="132,66 136,34 156,56"/><polygon points="188,66 184,34 164,56"/><circle cx="148" cy="82" r="4"/><circle cx="172" cy="82" r="4"/><polygon points="156,92 164,92 160,98"/><ellipse cx="160" cy="160" rx="24" ry="28"/></g><g stroke="#fff" stroke-width="1" fill="none"><path d="M70 34V196M64 34H76M64 196H76"/><path d="M108 210H212M108 204V216M212 204V216"/></g><g fill="#fff" font-family="monospace" font-size="10"><text x="40" y="118">162</text><text x="150" y="207" dy="-1">104</text><text x="236" y="24">CAT-01 · 1:4</text></g></svg></template>
+
+<script type="application/json" id="bank">
+[
+  {
+    "id": "t1", "type": "text", "difficulty": "入门",
+    "title": "一段课本文字变了腔调",
+    "left": "光合作用是绿色植物利用光能，把二氧化碳和水转化为储存能量的有机物，并释放出氧气的过程。该过程主要发生在叶绿体中，是地球上几乎所有生命的能量来源。",
+    "right": "• 啊哈，小水手！叶子就是靠阳光开伙的小厨房！\n• 它吞下空气和水，做出能填饱肚子的宝藏！\n• 还顺手吐出氧气，够咱全船人呼吸，嚯嚯！",
+    "prompt": "你是一位海盗船长。用海盗的口吻把下面这段话讲给 10 岁的小朋友听，写成三条要点，每条不超过 25 个字。",
+    "refs": [
+      "扮演海盗，用海盗的语气把这段文字解释给十岁小孩，输出 3 个要点，每个要点不超过 25 字。",
+      "请以海盗船长的角色，给小学生用三条 bullet 简短讲解下面的内容，每条限制在 25 字以内。",
+      "You are a pirate captain. Explain the following text to a 10-year-old kid in pirate voice, as three bullet points, each under 25 characters."
+    ],
+    "elements": [
+      {"label": "角色", "desc": "扮演海盗船长，用海盗的口吻", "weight": 3, "keywords": ["海盗", "船长", "pirate", "captain"]},
+      {"label": "受众", "desc": "讲给10岁的小朋友、儿童听", "weight": 2, "keywords": ["小朋友", "孩子", "小孩", "儿童", "小学生", "10岁", "10 岁", "十岁", "kid", "child", "year-old", "year old"]},
+      {"label": "格式", "desc": "写成三条要点、项目符号列表", "weight": 2, "keywords": ["三条", "三点", "三个要点", "3条", "3 条", "3个", "3 个", "要点", "bullet", "three"]},
+      {"label": "长度约束", "desc": "每条不超过25个字，要简短", "weight": 1, "keywords": ["不超过", "以内", "字数", "短", "精简", "限制在", "under", "at most", "no more than", "short"]}
+    ]
+  },
+  {
+    "id": "t2", "type": "text", "difficulty": "进阶", "rightMono": true,
+    "title": "一条差评变成了结构化数据",
+    "left": "上周买的这款 AirBrew 咖啡机真的让我很失望。用了三天就开始漏水，客服电话打了两次都没人接。外观倒是挺好看的，但这个价位不该是这种质量。",
+    "right": "{\n  \"sentiment\": \"负面\",\n  \"product\": \"AirBrew 咖啡机\",\n  \"issues\": [\"漏水\", \"客服无人接听\", \"质量与价格不符\"]\n}",
+    "prompt": "从下面的用户评论中提取信息，只输出 JSON，不要任何解释。字段包括：sentiment(正面/负面/中性)、product(产品名称)、issues(问题列表，数组)。",
+    "refs": [
+      "分析这条评论，以 JSON 格式返回情感倾向 sentiment、产品名 product 和问题数组 issues，除了 JSON 不要输出别的内容。",
+      "把下面的用户评价抽取成结构化 JSON：情感(正面、负面或中性)、产品名称、用户提到的问题列表。只返回 JSON。",
+      "Extract information from the customer review below. Output JSON only, no explanation, with fields: sentiment (positive/negative/neutral), product name, and an array of issues."
+    ],
+    "elements": [
+      {"label": "任务", "desc": "从用户评论中提取、抽取信息", "weight": 2, "keywords": ["提取", "抽取", "分析", "解析", "extract", "parse", "analyze"]},
+      {"label": "输出格式", "desc": "以 JSON 格式输出", "weight": 3, "keywords": ["json"]},
+      {"label": "只输出结果", "desc": "只输出 JSON，不要任何解释或多余内容", "weight": 2, "keywords": ["只输出", "只返回", "仅输出", "仅返回", "不要解释", "不要任何", "不要输出别的", "不要其他", "only", "no explanation", "nothing else"]},
+      {"label": "字段：情感", "desc": "情感倾向 sentiment，正面负面或中性", "weight": 2, "keywords": ["sentiment", "情感", "情绪", "正面", "负面"]},
+      {"label": "字段：产品", "desc": "产品名称 product", "weight": 1, "keywords": ["product", "产品", "商品"]},
+      {"label": "字段：问题", "desc": "用户提到的问题列表 issues 数组", "weight": 2, "keywords": ["issues", "issue", "问题", "缺点", "投诉", "problems"]}
+    ]
+  },
+  {
+    "id": "i1", "type": "image", "difficulty": "入门",
+    "title": "同一栋小屋，换了时间和天气",
+    "leftSvg": "house-day", "rightSvg": "house-night",
+    "prompt": "把这张图改成冬天的夜晚：天空变成深蓝色，加上满月和星星；地面和屋顶覆盖积雪，空中飘着雪花；窗户亮起暖黄色的灯光。保持构图不变。",
+    "refs": [
+      "保持房子和构图不变，把场景换成下雪的冬夜，有月亮和星星，屋顶和地上有积雪，窗户里透出暖色灯光。",
+      "改为夜景，季节改为冬季：深色夜空、月亮、星星、飘雪、积雪，窗户开灯发出黄光。",
+      "Turn this scene into a snowy winter night: dark blue sky with a full moon and stars, snow on the roof and ground, falling snowflakes, and warm yellow light glowing in the windows. Keep the composition."
+    ],
+    "elements": [
+      {"label": "时间", "desc": "改成夜晚、夜景、深色夜空", "weight": 3, "keywords": ["夜", "晚上", "night", "dark sky"]},
+      {"label": "天体", "desc": "加上月亮和星星", "weight": 2, "keywords": ["月", "星", "moon", "star"]},
+      {"label": "季节与天气", "desc": "冬天下雪，有积雪和雪花", "weight": 3, "keywords": ["雪", "冬", "snow", "winter"]},
+      {"label": "窗户灯光", "desc": "窗户亮起暖黄色灯光", "weight": 2, "keywords": ["灯", "亮起", "发光", "黄光", "暖光", "light", "glow", "lit"]},
+      {"label": "保持构图", "desc": "保持原来的房子和构图不变", "weight": 1, "keywords": ["保持", "不变", "不要改变", "keep", "same composition", "preserve"]}
+    ]
+  },
+  {
+    "id": "i2", "type": "image", "difficulty": "进阶",
+    "title": "一只猫被送进了设计院",
+    "leftSvg": "cat-flat", "rightSvg": "cat-blueprint",
+    "prompt": "把这只猫转成工程蓝图风格：深蓝色背景加浅色网格，只保留白色线稿、不要填充颜色，并加上尺寸标注线和图纸编号。",
+    "refs": [
+      "改成建筑蓝图/工程制图的样子，蓝底白线，带网格，去掉所有填色只留轮廓，加尺寸标注和数字。",
+      "用技术图纸的风格重画这只猫：蓝色背景、网格线、白色描边无填充，标出高度和宽度的尺寸线，右上角写上图号和比例。",
+      "Convert the cat into an engineering blueprint: dark blue background with a faint grid, white outline only with no fill, plus dimension lines with measurements and a drawing number."
+    ],
+    "elements": [
+      {"label": "风格", "desc": "工程蓝图、技术图纸、制图风格", "weight": 3, "keywords": ["蓝图", "图纸", "制图", "工程图", "blueprint", "technical drawing", "schematic"]},
+      {"label": "背景", "desc": "深蓝色背景加网格线", "weight": 2, "keywords": ["蓝色背景", "蓝底", "蓝色底", "网格", "grid", "blue background"]},
+      {"label": "线稿", "desc": "只保留白色线稿轮廓，不要填充颜色", "weight": 3, "keywords": ["线稿", "线条", "轮廓", "描边", "白线", "无填充", "不要填充", "去掉填色", "outline", "line art", "no fill", "wireframe"]},
+      {"label": "尺寸标注", "desc": "加上尺寸标注线和测量数字", "weight": 2, "keywords": ["尺寸", "标注", "测量", "dimension", "measurement", "annotation"]},
+      {"label": "图纸编号", "desc": "写上图纸编号或比例", "weight": 1, "keywords": ["编号", "图号", "比例", "drawing number", "scale", "label"]}
+    ]
+  }
+]
+</script>
+
+<script>
+(function(){
+const bank = JSON.parse(document.getElementById('bank').textContent);
+const MAX_TRIES = 3;
+const W = {sem:.35, elem:.45, len:.20};
+const $ = id => document.getElementById(id);
+
+/* ---------- 状态 ---------- */
+let state = {qi:0, rounds:{}, revealed:{}};
+const WHO = ['A','B'];
+// 每题一轮：phase idle → running → done；两人各自提交，都提交后才评分
+const round = q => state.rounds[q.id] || (state.rounds[q.id] = {phase:'idle', start:0, text:{}, time:{}, res:null});
+
+/* ---------- 向量引擎 ---------- */
+// 默认：字符 n-gram 词袋向量（中文单字+双字，英文单词），sqrt-TF，余弦相似度
+function ngramVec(text){
+  const v = new Map(); const add = k => v.set(k,(v.get(k)||0)+1);
+  const t = text.toLowerCase();
+  (t.match(/[a-z0-9]+/g)||[]).forEach(w => add('w:'+w));
+  (t.match(/[一-鿿]+/g)||[]).forEach(run => {
+    for(let i=0;i<run.length;i++){ add('c:'+run[i]); if(i+1<run.length) add('b:'+run[i]+run[i+1]); }
+  });
+  let n=0; v.forEach((c,k)=>{ const x=Math.sqrt(c); v.set(k,x); n+=x*x; });
+  n=Math.sqrt(n)||1; v.forEach((x,k)=>v.set(k,x/n));
+  return v;
+}
+function cosMap(a,b){ let s=0; const [p,q]=a.size<b.size?[a,b]:[b,a]; p.forEach((x,k)=>{ const y=q.get(k); if(y) s+=x*y; }); return s; }
+function cosArr(a,b){ let s=0; for(let i=0;i<a.length;i++) s+=a[i]*b[i]; return s; }
+
+const engines = {
+  ngram:  {name:'字符 n-gram 向量', lo:.08, hi:.60, near:.42, embed:async ts=>ts.map(ngramVec), cos:cosMap},
+  // bge 的余弦值整体偏高（不相关的句子也有 0.5 左右），所以校准区间比 n-gram 高
+  neural: {name:'bge-small-zh', lo:.55, hi:.90, near:.72, embed:null, cos:cosArr}
+};
+let engine = engines.ngram;
+
+// 后台加载中文 embedding 模型（量化版约 24MB，浏览器会缓存）。加载成功前、或环境不允许下载时，用 n-gram 兜底
+const MODEL = 'Xenova/bge-small-zh-v1.5';
+(async function loadNeural(){
+  const status = t => { $('engine').textContent = t; };
+  status('语义模型加载中');
+  try{
+    const tf = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2');
+    tf.env.allowLocalModels = false;
+    const pipe = await tf.pipeline('feature-extraction', MODEL, {quantized:true});
+    const cache = new Map();
+    engines.neural.embed = async ts => {
+      const need = [...new Set(ts.filter(t=>!cache.has(t)))];
+      if(need.length){ const out = await pipe(need,{pooling:'cls',normalize:true}); out.tolist().forEach((v,i)=>cache.set(need[i],v)); }
+      return ts.map(t=>cache.get(t));
+    };
+    await engines.neural.embed(['预热']);
+    engine = engines.neural; status('bge-small-zh');
+  }catch(e){ status('n-gram'); }
+})();
+
+/* ---------- 评分 ---------- */
+const clamp01 = x => Math.max(0, Math.min(1, x));
+// 长度单位：一个汉字 = 1，一个英文单词 = 2
+const units = t => (t.match(/[一-鿿]/g)||[]).length + 2*(t.match(/[A-Za-z0-9]+/g)||[]).length;
+function lenScore(q, text){
+  const ls = [q.prompt, ...q.refs].map(units), u = units(text);
+  const lo = .5*Math.min(...ls), hi = 1.5*Math.max(...ls);
+  if(u < lo) return clamp01(u/lo);
+  if(u > hi) return Math.exp(-(u-hi)/hi*1.6);
+  return 1;
+}
+async function scoreGuess(q, text){
+  const refs = [q.prompt, ...q.refs];
+  const clauses = text.split(/[，。；;,.!?！？\n:：]+/).map(s=>s.trim()).filter(s=>s.length>1);
+  const descs = q.elements.map(e=>e.desc);
+  const vecs = await engine.embed([text, ...refs, ...descs, ...clauses]);
+  const vT = vecs[0], vR = vecs.slice(1,1+refs.length), vD = vecs.slice(1+refs.length, 1+refs.length+descs.length), vC = vecs.slice(1+refs.length+descs.length);
+
+  const rawSem = Math.max(...vR.map(v=>engine.cos(vT,v)));
+  const sem = clamp01((rawSem-engine.lo)/(engine.hi-engine.lo));
+
+  const low = text.toLowerCase();
+  const hits = q.elements.map((e,i)=>{
+    if(e.keywords.some(k=>low.includes(k.toLowerCase()))) return 1;
+    const s = vC.length ? Math.max(...vC.map(c=>engine.cos(c,vD[i]))) : 0;
+    return s >= engine.near ? .5 : 0;
+  });
+  const wSum = q.elements.reduce((a,e)=>a+e.weight,0);
+  const elem = q.elements.reduce((a,e,i)=>a+e.weight*hits[i],0)/wSum;
+
+  const len = lenScore(q, text);
+  // 防刷分：要素分受简洁度折扣；简洁度分只有在内容相关时才拿得到
+  const elemEff = elem*(.5+.5*len), lenEff = len*Math.max(sem, elem);
+  const total = Math.round(100*(W.sem*sem + W.elem*elemEff + W.len*lenEff));
+  return {total, sem, elem, len, hits, rawSem};
+}
+
+/* ---------- 渲染 ---------- */
+function esc(s){ return s.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function fmt(ms){ const t=ms/1000, m=Math.floor(t/60); return (m? m+':'+String((t%60).toFixed(1)).padStart(4,'0') : t.toFixed(1)+'s'); }
+function fillPane(el, q, side){
+  el.className = 'content'; el.textContent = '';
+  const svg = q[side+'Svg'], img = q[side+'Img'];
+  if(svg) el.appendChild($('svg-'+svg).content.cloneNode(true));
+  else if(img){ const i=new Image(); i.src=img; i.alt=side==='left'?'原图':'处理后的图'; el.appendChild(i); }
+  else { el.textContent = q[side]; if(side==='right' && q.rightMono) el.classList.add('mono'); }
+}
+function renderNav(){
+  $('nav').innerHTML = bank.map((q,i)=>`<button data-i="${i}" aria-current="${i===state.qi}">${i+1}</button>`).join('');
+  const sum = i => bank.reduce((a,q)=>{ const r=round(q).res; return a+(r?r[i].total:0); },0);
+  $('totalScore').textContent = `A ${sum(0)} · B ${sum(1)}`;
+}
+function renderTimes(){
+  const rd = round(bank[state.qi]);
+  WHO.forEach(w=>{
+    $('time'+w).textContent = rd.time[w]!=null ? fmt(rd.time[w]) : rd.phase==='running' ? fmt(Date.now()-rd.start) : '';
+  });
+}
+function renderControls(){
+  const q = bank[state.qi], rd = round(q), rev = !!state.revealed[q.id];
+  $('shade').hidden = rd.phase!=='idle';
+  WHO.forEach(w=>{
+    const sent = rd.time[w]!=null, done = rd.phase==='done';
+    $('guess'+w).disabled = sent || rd.phase!=='running';
+    $('submit'+w).disabled = !done && (sent || rd.phase!=='running' || units($('guess'+w).value) < 3);
+    $('submit'+w).textContent = done ? '揭晓答案' : sent ? '已提交，等待对方' : '提交';
+  });
+  renderTimes();
+}
+function renderResults(){
+  const q = bank[state.qi], rd = round(q);
+  $('results').hidden = !rd.res;
+  if(rd.res) WHO.forEach((w,i)=>renderResult($('res'+w), q, rd.res[i], rd.text[w], rd.time[w]));
+}
+function renderQuestion(){
+  const q = bank[state.qi], rd = round(q);
+  fillPane($('leftPane'), q, 'left'); fillPane($('rightPane'), q, 'right');
+  WHO.forEach(w=>{ $('guess'+w).value = rd.text[w]||''; });
+  renderNav(); renderControls(); renderResults();
+}
+function renderResult(el, q, r, text, time){
+  const pct = x => Math.round(x*100), rev = state.revealed[q.id];
+  const tips = [];
+  if(r.len<.7) tips.push(units(text) < units(q.prompt) ? '写得太短。' : '写得太长，要素分被打折了。');
+  if(r.hits.some(h=>h===.5)) tips.push('◐ 表示意思接近但没说准。');
+  el.innerHTML = `<div class="score"><b>${r.total}</b><span class="muted num">用时 ${fmt(time)} · 语义 ${pct(r.sem)} · 要素 ${pct(r.elem)} · 简洁 ${pct(r.len)}</span></div><ul>` +
+    q.elements.map((e,i)=>{
+      const h = r.hits[i], cls = h===1?'hit':h>0?'near':'miss', mark = h===1?'✓':h>0?'◐':'✗';
+      return `<li><span class="mark ${cls}">${mark}</span><span>${esc(e.label)}${(h===1||rev)?` <span class="muted">${esc(e.desc)}</span>`:''}</span></li>`;
+    }).join('') + `</ul><p class="note">${tips.join(' ')}</p>`;
+}
+
+/* ---------- 事件 ---------- */
+$('nav').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return; state.qi=+b.dataset.i; renderQuestion(); });
+$('startBtn').addEventListener('click', ()=>{ const rd=round(bank[state.qi]); rd.phase='running'; rd.start=Date.now(); renderControls(); $('guessA').focus(); });
+WHO.forEach(w=>{
+  $('guess'+w).addEventListener('input', ()=>{ round(bank[state.qi]).text[w]=$('guess'+w).value; renderControls(); });
+  $('submit'+w).addEventListener('click', async ()=>{
+    const q = bank[state.qi], rd = round(q);
+    if(rd.phase==='done'){ openReveal(q); return; }
+    rd.time[w] = Date.now()-rd.start;
+    rd.text[w] = $('guess'+w).value.trim();
+    if(WHO.every(x=>rd.time[x]!=null)){
+      rd.res = await Promise.all(WHO.map(x=>scoreGuess(q, rd.text[x])));
+      rd.phase = 'done';
+    }
+    if(bank[state.qi]===q){ renderNav(); renderControls(); renderResults(); }
+  });
+});
+function openReveal(q){
+  state.revealed[q.id] = true;
+  $('origPrompt').textContent = q.prompt;
+  $('revealEls').innerHTML = q.elements.map(e=>`<li><span class="muted">${esc(e.label)} ×${e.weight}</span><span>${esc(e.desc)}</span></li>`).join('');
+  $('refList').innerHTML = q.refs.map(r=>`<li>${esc(r)}</li>`).join('');
+  renderResults();
+  $('reveal').showModal();
+}
+$('closeReveal').addEventListener('click', ()=>$('reveal').close());
+$('reveal').addEventListener('click', e=>{ if(e.target===$('reveal')) $('reveal').close(); });
+setInterval(renderTimes, 100);
+
+renderQuestion();
+})();
+</script>
