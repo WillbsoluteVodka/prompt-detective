@@ -81,7 +81,6 @@ li .mark{flex:none;width:1.2em;font-weight:700}
   <div class="top">
     <h1>Prompt 逆推场</h1>
     <div id="nav"></div>
-    <span class="muted" id="engine" style="font-size:.7em"></span>
     <span class="muted num" id="totalScore"></span>
   </div>
 
@@ -1920,6 +1919,435 @@ li .mark{flex:none;width:1.2em;font-weight:700}
         ]
       }
     ]
+  },
+  {
+    "id": "t23",
+    "type": "text",
+    "difficulty": "入门",
+    "title": "标题被起了三个",
+    "left": "研究发现，每天步行 30 分钟的人，十年内患心脏病的风险比不运动的人低 35%。",
+    "right": "1. 每天走半小时，心脏病风险降三成\n2. 研究：日行 30 分钟，十年护心\n3. 不用跑步，走路也能保护心脏",
+    "prompt": "给这条新闻起 3 个标题，每个不超过 15 个字，风格分别是：直接陈述、带数据、吸引点击。",
+    "refs": [
+      "写三个不同风格的新闻标题，各 15 字以内。",
+      "起三个标题：一个平实，一个突出数字，一个有吸引力，都要短。",
+      "Write three headlines for this news, each under 15 characters, in different styles."
+    ],
+    "elements": [
+      {
+        "label": "起标题",
+        "desc": "为新闻起标题",
+        "weight": 3,
+        "keywords": [
+          "标题",
+          "题目",
+          "headline",
+          "title"
+        ]
+      },
+      {
+        "label": "数量",
+        "desc": "3 个",
+        "weight": 3,
+        "keywords": [
+          "三个",
+          "3个",
+          "3 个",
+          "三条",
+          "three"
+        ]
+      },
+      {
+        "label": "字数",
+        "desc": "每个不超过 15 字",
+        "weight": 2,
+        "keywords": [
+          "15",
+          "十五",
+          "字以内",
+          "不超过",
+          "短",
+          "characters"
+        ]
+      },
+      {
+        "label": "风格不同",
+        "desc": "三种不同风格",
+        "weight": 2,
+        "keywords": [
+          "风格",
+          "不同",
+          "陈述",
+          "数据",
+          "吸引",
+          "style",
+          "different"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t24",
+    "type": "text",
+    "difficulty": "入门",
+    "title": "回答变成了只有一个词",
+    "left": "法国的首都是哪里？巴黎的人口大约有多少？埃菲尔铁塔是哪一年建成的？",
+    "right": "巴黎\n约 210 万\n1889 年",
+    "prompt": "逐个回答下面的问题，每个答案只写关键词或数字，一行一个，不要完整句子，不要解释。",
+    "refs": [
+      "每个问题只给最简短的答案，一行一个，不要写成句子。",
+      "只输出答案本身，每行一个，不加任何说明。",
+      "Answer each question with just the keyword or number, one per line, no full sentences, no explanation."
+    ],
+    "elements": [
+      {
+        "label": "极简回答",
+        "desc": "只写关键词或数字",
+        "weight": 4,
+        "keywords": [
+          "关键词",
+          "数字",
+          "最简",
+          "简短",
+          "答案本身",
+          "只写",
+          "只给",
+          "keyword",
+          "number",
+          "just"
+        ]
+      },
+      {
+        "label": "一行一个",
+        "desc": "每个答案一行",
+        "weight": 3,
+        "keywords": [
+          "一行",
+          "每行",
+          "逐个",
+          "one per line",
+          "each line"
+        ]
+      },
+      {
+        "label": "不要句子",
+        "desc": "不要完整句子、不要解释",
+        "weight": 3,
+        "keywords": [
+          "不要",
+          "不加",
+          "句子",
+          "解释",
+          "说明",
+          "no sentence",
+          "no explanation"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t25",
+    "type": "text",
+    "difficulty": "进阶",
+    "title": "文章多了一段开头",
+    "left": "第一步，打开设置。第二步，点击“网络”。第三步，选择你的 Wi-Fi 并输入密码。",
+    "right": "连不上网？别急，三步搞定。\n\n第一步，打开设置。第二步，点击“网络”。第三步，选择你的 Wi-Fi 并输入密码。",
+    "prompt": "在这段说明前面加一句吸引读者的开场白，不超过 15 个字，用问句开头，正文原样保留。",
+    "refs": [
+      "只在开头加一句简短的引子(问句形式，15 字内)，正文一个字都不要改。",
+      "给这段步骤加一个抓人的开头，用问题引入，后面内容保持不变。",
+      "Add a short hook sentence (a question, under 15 characters) before the text, keep the body unchanged."
+    ],
+    "elements": [
+      {
+        "label": "加开场白",
+        "desc": "在前面加一句开场白、引子",
+        "weight": 3,
+        "keywords": [
+          "开场",
+          "开头",
+          "引子",
+          "引入",
+          "前面加",
+          "hook",
+          "intro",
+          "opening"
+        ]
+      },
+      {
+        "label": "问句",
+        "desc": "用问句开头",
+        "weight": 3,
+        "keywords": [
+          "问句",
+          "问题",
+          "疑问",
+          "question"
+        ]
+      },
+      {
+        "label": "字数",
+        "desc": "不超过 15 字",
+        "weight": 1,
+        "keywords": [
+          "15",
+          "十五",
+          "字",
+          "简短",
+          "short",
+          "characters"
+        ]
+      },
+      {
+        "label": "正文不变",
+        "desc": "正文原样保留",
+        "weight": 3,
+        "keywords": [
+          "不变",
+          "不改",
+          "原样",
+          "保留",
+          "保持",
+          "unchanged",
+          "keep",
+          "same"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t26",
+    "type": "text",
+    "difficulty": "进阶",
+    "title": "回复带上了情绪识别",
+    "left": "我等了你们三天了，订单还没发货，客服也不回消息，太让人失望了！",
+    "right": "非常抱歉让您等了这么久，我完全理解您的失望。我现在立刻帮您查询订单状态，并优先安排发货。查到结果后会第一时间告诉您。",
+    "prompt": "你是客服。先用一句话对用户的情绪表示理解和道歉，再说明你马上要采取的具体行动，不要找借口，不超过 80 字。",
+    "refs": [
+      "客服回复：先共情道歉，再给出具体的处理动作，不解释原因，控制在 80 字以内。",
+      "扮演客服，回复要先安抚情绪，然后说明接下来会怎么做，别推卸责任，简短。",
+      "As customer support, first acknowledge the feeling and apologize, then state the concrete action you'll take now, no excuses, under 80 characters."
+    ],
+    "elements": [
+      {
+        "label": "角色",
+        "desc": "客服",
+        "weight": 1,
+        "keywords": [
+          "客服",
+          "support",
+          "customer service"
+        ]
+      },
+      {
+        "label": "共情道歉",
+        "desc": "先对情绪表示理解并道歉",
+        "weight": 3,
+        "keywords": [
+          "理解",
+          "共情",
+          "安抚",
+          "道歉",
+          "抱歉",
+          "情绪",
+          "empath",
+          "apolog",
+          "acknowledge"
+        ]
+      },
+      {
+        "label": "具体行动",
+        "desc": "说明马上要做的具体行动",
+        "weight": 3,
+        "keywords": [
+          "行动",
+          "动作",
+          "处理",
+          "怎么做",
+          "接下来",
+          "action",
+          "do"
+        ]
+      },
+      {
+        "label": "不找借口",
+        "desc": "不要找借口、不推卸",
+        "weight": 2,
+        "keywords": [
+          "借口",
+          "推卸",
+          "不解释",
+          "不要解释原因",
+          "excuse",
+          "blame"
+        ]
+      },
+      {
+        "label": "字数",
+        "desc": "不超过 80 字",
+        "weight": 1,
+        "keywords": [
+          "80",
+          "八十",
+          "字以内",
+          "不超过",
+          "简短",
+          "characters"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t27",
+    "type": "text",
+    "difficulty": "进阶",
+    "rightMono": true,
+    "title": "文字变成了流程图代码",
+    "left": "用户提交订单后，系统检查库存。有库存就扣减库存并发货；没有库存就通知用户缺货，流程结束。",
+    "right": "flowchart TD\n  A[提交订单] --> B{有库存?}\n  B -- 是 --> C[扣减库存]\n  C --> D[发货]\n  B -- 否 --> E[通知缺货]\n  E --> F[结束]\n  D --> F",
+    "prompt": "把这段流程描述转换成 Mermaid 流程图代码，从上到下布局，判断节点用菱形，只输出代码。",
+    "refs": [
+      "用 Mermaid flowchart 语法画出这个流程，TD 方向，条件判断用菱形节点，不要解释。",
+      "输出 mermaid 流程图，纵向排列，分支处用 {} 判断节点，只要代码块。",
+      "Convert this into Mermaid flowchart code, top-down, diamonds for decisions, code only."
+    ],
+    "elements": [
+      {
+        "label": "流程图",
+        "desc": "转换成流程图",
+        "weight": 3,
+        "keywords": [
+          "流程图",
+          "flowchart",
+          "flow chart",
+          "diagram"
+        ]
+      },
+      {
+        "label": "Mermaid",
+        "desc": "用 Mermaid 语法",
+        "weight": 3,
+        "keywords": [
+          "mermaid"
+        ]
+      },
+      {
+        "label": "方向",
+        "desc": "从上到下布局",
+        "weight": 1,
+        "keywords": [
+          "从上到下",
+          "纵向",
+          "上下",
+          "td",
+          "top-down",
+          "top down"
+        ]
+      },
+      {
+        "label": "判断节点",
+        "desc": "判断用菱形节点",
+        "weight": 2,
+        "keywords": [
+          "菱形",
+          "判断",
+          "条件",
+          "分支",
+          "diamond",
+          "decision",
+          "{"
+        ]
+      },
+      {
+        "label": "只输出代码",
+        "desc": "只输出代码",
+        "weight": 1,
+        "keywords": [
+          "只输出",
+          "只要",
+          "不要解释",
+          "code only",
+          "only code"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t28",
+    "type": "text",
+    "difficulty": "困难",
+    "title": "回答被要求承认不确定",
+    "left": "2031 年的诺贝尔物理学奖会颁给谁？",
+    "right": "我无法预测这个结果。诺贝尔奖的评选结果在公布前不对外透露，任何关于未来获奖者的说法都只是猜测。如果你感兴趣，我可以介绍近年来物理学界受到广泛关注的几个研究方向。",
+    "prompt": "回答时如果问题涉及无法确定或无法预知的信息，要明确说明你不知道，不要编造，并解释为什么无法回答，然后主动提供一个相关的、你能帮上忙的方向。",
+    "refs": [
+      "遇到不可知的问题直接承认不知道，说明原因，不要瞎编，最后给一个可以替代的帮助。",
+      "对无法预测的事情要坦白说不能回答，讲清为什么，再提议一个相关的替代话题。",
+      "If the question asks for something unknowable, say clearly that you don't know, explain why, never make things up, and offer a related way you can help."
+    ],
+    "elements": [
+      {
+        "label": "承认不知道",
+        "desc": "明确说明不知道、无法回答",
+        "weight": 4,
+        "keywords": [
+          "不知道",
+          "无法",
+          "不能回答",
+          "承认",
+          "坦白",
+          "不确定",
+          "don't know",
+          "cannot",
+          "unknow",
+          "uncertain"
+        ]
+      },
+      {
+        "label": "不编造",
+        "desc": "不要编造、瞎编",
+        "weight": 3,
+        "keywords": [
+          "编造",
+          "瞎编",
+          "捏造",
+          "猜测",
+          "make up",
+          "fabricat",
+          "guess"
+        ]
+      },
+      {
+        "label": "解释原因",
+        "desc": "解释为什么无法回答",
+        "weight": 2,
+        "keywords": [
+          "原因",
+          "为什么",
+          "解释",
+          "说明",
+          "why",
+          "explain"
+        ]
+      },
+      {
+        "label": "替代帮助",
+        "desc": "主动提供相关的替代方向",
+        "weight": 2,
+        "keywords": [
+          "替代",
+          "相关",
+          "可以帮",
+          "提供",
+          "提议",
+          "方向",
+          "alternative",
+          "instead",
+          "offer",
+          "related"
+        ]
+      }
+    ]
   }
 ]
 </script>
@@ -1963,7 +2391,7 @@ let engine = engines.ngram;
 // 后台加载中文 embedding 模型（量化版约 24MB，浏览器会缓存）。加载成功前、或环境不允许下载时，用 n-gram 兜底
 const MODEL = 'Xenova/bge-small-zh-v1.5';
 (async function loadNeural(){
-  const status = t => { $('engine').textContent = t; };
+  const status = () => {};
   status('语义模型加载中');
   try{
     const tf = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2');
