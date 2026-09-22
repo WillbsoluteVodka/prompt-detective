@@ -25,7 +25,7 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 
 .top{position:relative;z-index:11;display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 28px;margin-bottom:32px}
 .top h1{font-size:1em;font-weight:700;margin:0}
-#nav{display:flex;gap:20px;flex:1}
+#nav{display:flex;flex-wrap:wrap;gap:6px 18px;flex:1}
 #nav button{padding-bottom:2px;border-bottom:2px solid transparent;color:var(--muted)}
 #nav button[aria-current="true"]{color:var(--ink);border-color:var(--ink)}
 
@@ -128,7 +128,9 @@ li .mark{flex:none;width:1.2em;font-weight:700}
 <script type="application/json" id="bank">
 [
   {
-    "id": "t1", "type": "text", "difficulty": "入门",
+    "id": "t1",
+    "type": "text",
+    "difficulty": "入门",
     "title": "一段课本文字变了腔调",
     "left": "光合作用是绿色植物利用光能，把二氧化碳和水转化为储存能量的有机物，并释放出氧气的过程。该过程主要发生在叶绿体中，是地球上几乎所有生命的能量来源。",
     "right": "• 啊哈，小水手！叶子就是靠阳光开伙的小厨房！\n• 它吞下空气和水，做出能填饱肚子的宝藏！\n• 还顺手吐出氧气，够咱全船人呼吸，嚯嚯！",
@@ -139,14 +141,77 @@ li .mark{flex:none;width:1.2em;font-weight:700}
       "You are a pirate captain. Explain the following text to a 10-year-old kid in pirate voice, as three bullet points, each under 25 characters."
     ],
     "elements": [
-      {"label": "角色", "desc": "扮演海盗船长，用海盗的口吻", "weight": 3, "keywords": ["海盗", "船长", "pirate", "captain"]},
-      {"label": "受众", "desc": "讲给10岁的小朋友、儿童听", "weight": 2, "keywords": ["小朋友", "孩子", "小孩", "儿童", "小学生", "10岁", "10 岁", "十岁", "kid", "child", "year-old", "year old"]},
-      {"label": "格式", "desc": "写成三条要点、项目符号列表", "weight": 2, "keywords": ["三条", "三点", "三个要点", "3条", "3 条", "3个", "3 个", "要点", "bullet", "three"]},
-      {"label": "长度约束", "desc": "每条不超过25个字，要简短", "weight": 1, "keywords": ["不超过", "以内", "字数", "短", "精简", "限制在", "under", "at most", "no more than", "short"]}
+      {
+        "label": "角色",
+        "desc": "扮演海盗船长，用海盗的口吻",
+        "weight": 3,
+        "keywords": [
+          "海盗",
+          "船长",
+          "pirate",
+          "captain"
+        ]
+      },
+      {
+        "label": "受众",
+        "desc": "讲给10岁的小朋友、儿童听",
+        "weight": 2,
+        "keywords": [
+          "小朋友",
+          "孩子",
+          "小孩",
+          "儿童",
+          "小学生",
+          "10岁",
+          "10 岁",
+          "十岁",
+          "kid",
+          "child",
+          "year-old",
+          "year old"
+        ]
+      },
+      {
+        "label": "格式",
+        "desc": "写成三条要点、项目符号列表",
+        "weight": 2,
+        "keywords": [
+          "三条",
+          "三点",
+          "三个要点",
+          "3条",
+          "3 条",
+          "3个",
+          "3 个",
+          "要点",
+          "bullet",
+          "three"
+        ]
+      },
+      {
+        "label": "长度约束",
+        "desc": "每条不超过25个字，要简短",
+        "weight": 1,
+        "keywords": [
+          "不超过",
+          "以内",
+          "字数",
+          "短",
+          "精简",
+          "限制在",
+          "under",
+          "at most",
+          "no more than",
+          "short"
+        ]
+      }
     ]
   },
   {
-    "id": "t2", "type": "text", "difficulty": "进阶", "rightMono": true,
+    "id": "t2",
+    "type": "text",
+    "difficulty": "进阶",
+    "rightMono": true,
     "title": "一条差评变成了结构化数据",
     "left": "上周买的这款 AirBrew 咖啡机真的让我很失望。用了三天就开始漏水，客服电话打了两次都没人接。外观倒是挺好看的，但这个价位不该是这种质量。",
     "right": "{\n  \"sentiment\": \"负面\",\n  \"product\": \"AirBrew 咖啡机\",\n  \"issues\": [\"漏水\", \"客服无人接听\", \"质量与价格不符\"]\n}",
@@ -157,18 +222,90 @@ li .mark{flex:none;width:1.2em;font-weight:700}
       "Extract information from the customer review below. Output JSON only, no explanation, with fields: sentiment (positive/negative/neutral), product name, and an array of issues."
     ],
     "elements": [
-      {"label": "任务", "desc": "从用户评论中提取、抽取信息", "weight": 2, "keywords": ["提取", "抽取", "分析", "解析", "extract", "parse", "analyze"]},
-      {"label": "输出格式", "desc": "以 JSON 格式输出", "weight": 3, "keywords": ["json"]},
-      {"label": "只输出结果", "desc": "只输出 JSON，不要任何解释或多余内容", "weight": 2, "keywords": ["只输出", "只返回", "仅输出", "仅返回", "不要解释", "不要任何", "不要输出别的", "不要其他", "only", "no explanation", "nothing else"]},
-      {"label": "字段：情感", "desc": "情感倾向 sentiment，正面负面或中性", "weight": 2, "keywords": ["sentiment", "情感", "情绪", "正面", "负面"]},
-      {"label": "字段：产品", "desc": "产品名称 product", "weight": 1, "keywords": ["product", "产品", "商品"]},
-      {"label": "字段：问题", "desc": "用户提到的问题列表 issues 数组", "weight": 2, "keywords": ["issues", "issue", "问题", "缺点", "投诉", "problems"]}
+      {
+        "label": "任务",
+        "desc": "从用户评论中提取、抽取信息",
+        "weight": 2,
+        "keywords": [
+          "提取",
+          "抽取",
+          "分析",
+          "解析",
+          "extract",
+          "parse",
+          "analyze"
+        ]
+      },
+      {
+        "label": "输出格式",
+        "desc": "以 JSON 格式输出",
+        "weight": 3,
+        "keywords": [
+          "json"
+        ]
+      },
+      {
+        "label": "只输出结果",
+        "desc": "只输出 JSON，不要任何解释或多余内容",
+        "weight": 2,
+        "keywords": [
+          "只输出",
+          "只返回",
+          "仅输出",
+          "仅返回",
+          "不要解释",
+          "不要任何",
+          "不要输出别的",
+          "不要其他",
+          "only",
+          "no explanation",
+          "nothing else"
+        ]
+      },
+      {
+        "label": "字段：情感",
+        "desc": "情感倾向 sentiment，正面负面或中性",
+        "weight": 2,
+        "keywords": [
+          "sentiment",
+          "情感",
+          "情绪",
+          "正面",
+          "负面"
+        ]
+      },
+      {
+        "label": "字段：产品",
+        "desc": "产品名称 product",
+        "weight": 1,
+        "keywords": [
+          "product",
+          "产品",
+          "商品"
+        ]
+      },
+      {
+        "label": "字段：问题",
+        "desc": "用户提到的问题列表 issues 数组",
+        "weight": 2,
+        "keywords": [
+          "issues",
+          "issue",
+          "问题",
+          "缺点",
+          "投诉",
+          "problems"
+        ]
+      }
     ]
   },
   {
-    "id": "i1", "type": "image", "difficulty": "入门",
+    "id": "i1",
+    "type": "image",
+    "difficulty": "入门",
     "title": "同一栋小屋，换了时间和天气",
-    "leftSvg": "house-day", "rightSvg": "house-night",
+    "leftSvg": "house-day",
+    "rightSvg": "house-night",
     "prompt": "把这张图改成冬天的夜晚：天空变成深蓝色，加上满月和星星；地面和屋顶覆盖积雪，空中飘着雪花；窗户亮起暖黄色的灯光。保持构图不变。",
     "refs": [
       "保持房子和构图不变，把场景换成下雪的冬夜，有月亮和星星，屋顶和地上有积雪，窗户里透出暖色灯光。",
@@ -176,17 +313,76 @@ li .mark{flex:none;width:1.2em;font-weight:700}
       "Turn this scene into a snowy winter night: dark blue sky with a full moon and stars, snow on the roof and ground, falling snowflakes, and warm yellow light glowing in the windows. Keep the composition."
     ],
     "elements": [
-      {"label": "时间", "desc": "改成夜晚、夜景、深色夜空", "weight": 3, "keywords": ["夜", "晚上", "night", "dark sky"]},
-      {"label": "天体", "desc": "加上月亮和星星", "weight": 2, "keywords": ["月", "星", "moon", "star"]},
-      {"label": "季节与天气", "desc": "冬天下雪，有积雪和雪花", "weight": 3, "keywords": ["雪", "冬", "snow", "winter"]},
-      {"label": "窗户灯光", "desc": "窗户亮起暖黄色灯光", "weight": 2, "keywords": ["灯", "亮起", "发光", "黄光", "暖光", "light", "glow", "lit"]},
-      {"label": "保持构图", "desc": "保持原来的房子和构图不变", "weight": 1, "keywords": ["保持", "不变", "不要改变", "keep", "same composition", "preserve"]}
+      {
+        "label": "时间",
+        "desc": "改成夜晚、夜景、深色夜空",
+        "weight": 3,
+        "keywords": [
+          "夜",
+          "晚上",
+          "night",
+          "dark sky"
+        ]
+      },
+      {
+        "label": "天体",
+        "desc": "加上月亮和星星",
+        "weight": 2,
+        "keywords": [
+          "月",
+          "星",
+          "moon",
+          "star"
+        ]
+      },
+      {
+        "label": "季节与天气",
+        "desc": "冬天下雪，有积雪和雪花",
+        "weight": 3,
+        "keywords": [
+          "雪",
+          "冬",
+          "snow",
+          "winter"
+        ]
+      },
+      {
+        "label": "窗户灯光",
+        "desc": "窗户亮起暖黄色灯光",
+        "weight": 2,
+        "keywords": [
+          "灯",
+          "亮起",
+          "发光",
+          "黄光",
+          "暖光",
+          "light",
+          "glow",
+          "lit"
+        ]
+      },
+      {
+        "label": "保持构图",
+        "desc": "保持原来的房子和构图不变",
+        "weight": 1,
+        "keywords": [
+          "保持",
+          "不变",
+          "不要改变",
+          "keep",
+          "same composition",
+          "preserve"
+        ]
+      }
     ]
   },
   {
-    "id": "i2", "type": "image", "difficulty": "进阶",
+    "id": "i2",
+    "type": "image",
+    "difficulty": "进阶",
     "title": "一只猫被送进了设计院",
-    "leftSvg": "cat-flat", "rightSvg": "cat-blueprint",
+    "leftSvg": "cat-flat",
+    "rightSvg": "cat-blueprint",
     "prompt": "把这只猫转成工程蓝图风格：深蓝色背景加浅色网格，只保留白色线稿、不要填充颜色，并加上尺寸标注线和图纸编号。",
     "refs": [
       "改成建筑蓝图/工程制图的样子，蓝底白线，带网格，去掉所有填色只留轮廓，加尺寸标注和数字。",
@@ -194,11 +390,1535 @@ li .mark{flex:none;width:1.2em;font-weight:700}
       "Convert the cat into an engineering blueprint: dark blue background with a faint grid, white outline only with no fill, plus dimension lines with measurements and a drawing number."
     ],
     "elements": [
-      {"label": "风格", "desc": "工程蓝图、技术图纸、制图风格", "weight": 3, "keywords": ["蓝图", "图纸", "制图", "工程图", "blueprint", "technical drawing", "schematic"]},
-      {"label": "背景", "desc": "深蓝色背景加网格线", "weight": 2, "keywords": ["蓝色背景", "蓝底", "蓝色底", "网格", "grid", "blue background"]},
-      {"label": "线稿", "desc": "只保留白色线稿轮廓，不要填充颜色", "weight": 3, "keywords": ["线稿", "线条", "轮廓", "描边", "白线", "无填充", "不要填充", "去掉填色", "outline", "line art", "no fill", "wireframe"]},
-      {"label": "尺寸标注", "desc": "加上尺寸标注线和测量数字", "weight": 2, "keywords": ["尺寸", "标注", "测量", "dimension", "measurement", "annotation"]},
-      {"label": "图纸编号", "desc": "写上图纸编号或比例", "weight": 1, "keywords": ["编号", "图号", "比例", "drawing number", "scale", "label"]}
+      {
+        "label": "风格",
+        "desc": "工程蓝图、技术图纸、制图风格",
+        "weight": 3,
+        "keywords": [
+          "蓝图",
+          "图纸",
+          "制图",
+          "工程图",
+          "blueprint",
+          "technical drawing",
+          "schematic"
+        ]
+      },
+      {
+        "label": "背景",
+        "desc": "深蓝色背景加网格线",
+        "weight": 2,
+        "keywords": [
+          "蓝色背景",
+          "蓝底",
+          "蓝色底",
+          "网格",
+          "grid",
+          "blue background"
+        ]
+      },
+      {
+        "label": "线稿",
+        "desc": "只保留白色线稿轮廓，不要填充颜色",
+        "weight": 3,
+        "keywords": [
+          "线稿",
+          "线条",
+          "轮廓",
+          "描边",
+          "白线",
+          "无填充",
+          "不要填充",
+          "去掉填色",
+          "outline",
+          "line art",
+          "no fill",
+          "wireframe"
+        ]
+      },
+      {
+        "label": "尺寸标注",
+        "desc": "加上尺寸标注线和测量数字",
+        "weight": 2,
+        "keywords": [
+          "尺寸",
+          "标注",
+          "测量",
+          "dimension",
+          "measurement",
+          "annotation"
+        ]
+      },
+      {
+        "label": "图纸编号",
+        "desc": "写上图纸编号或比例",
+        "weight": 1,
+        "keywords": [
+          "编号",
+          "图号",
+          "比例",
+          "drawing number",
+          "scale",
+          "label"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t3",
+    "type": "text",
+    "difficulty": "入门",
+    "title": "英文变中文，还变了身份",
+    "left": "Hey! Just checking if you're still up for dinner on Friday. Let me know!",
+    "right": "尊敬的王先生：\n\n您好。冒昧打扰，想向您确认本周五的晚餐安排是否仍然方便。期待您的回复。\n\n此致\n敬礼",
+    "prompt": "把这条消息翻译成中文，改写成正式的商务邮件，收件人是王先生，加上称呼和落款。",
+    "refs": [
+      "翻译成中文，语气改为正式商务风格，写成给王先生的邮件格式，包含开头称呼和结尾敬语。",
+      "将下面的英文短信译为中文，并以正式邮件的口吻重写，对象是王先生，要有称呼和结尾。",
+      "Translate into Chinese and rewrite as a formal business email addressed to Mr. Wang, with a salutation and sign-off."
+    ],
+    "elements": [
+      {
+        "label": "翻译",
+        "desc": "翻译成中文",
+        "weight": 3,
+        "keywords": [
+          "翻译",
+          "译成",
+          "译为",
+          "中文",
+          "translate",
+          "chinese"
+        ]
+      },
+      {
+        "label": "语气",
+        "desc": "改成正式、商务的语气",
+        "weight": 3,
+        "keywords": [
+          "正式",
+          "商务",
+          "礼貌",
+          "formal",
+          "business",
+          "polite"
+        ]
+      },
+      {
+        "label": "收件人",
+        "desc": "收件人是王先生",
+        "weight": 2,
+        "keywords": [
+          "王先生",
+          "王",
+          "mr. wang",
+          "mr wang"
+        ]
+      },
+      {
+        "label": "邮件格式",
+        "desc": "邮件格式，有称呼和落款",
+        "weight": 2,
+        "keywords": [
+          "邮件",
+          "称呼",
+          "落款",
+          "敬语",
+          "结尾",
+          "email",
+          "salutation",
+          "sign"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t4",
+    "type": "text",
+    "difficulty": "入门",
+    "title": "长文变一句话",
+    "left": "近日，市教育局发布通知，从下学期开始，全市中小学将统一把上课时间推迟到早上 8:30。通知指出，此举旨在保证学生充足的睡眠时间。此前，多所学校的上课时间为 7:30 或 8:00。家长对此反应不一，部分家长表示支持，也有家长担心与上班时间冲突。",
+    "right": "下学期起全市中小学统一推迟到 8:30 上课，以保证学生睡眠，家长反应不一。",
+    "prompt": "用一句话概括下面这则新闻，不超过 40 个字，保留最关键的事实。",
+    "refs": [
+      "把这条新闻压缩成一句话，40 字以内，只留最重要的信息。",
+      "一句话总结这段新闻，字数控制在四十字内。",
+      "Summarize this news item in one sentence of at most 40 Chinese characters, keeping only the key facts."
+    ],
+    "elements": [
+      {
+        "label": "任务",
+        "desc": "概括、总结、压缩",
+        "weight": 3,
+        "keywords": [
+          "概括",
+          "总结",
+          "摘要",
+          "压缩",
+          "提炼",
+          "summar",
+          "condense"
+        ]
+      },
+      {
+        "label": "一句话",
+        "desc": "只用一句话",
+        "weight": 3,
+        "keywords": [
+          "一句话",
+          "一句",
+          "one sentence",
+          "single sentence"
+        ]
+      },
+      {
+        "label": "字数",
+        "desc": "不超过 40 个字",
+        "weight": 2,
+        "keywords": [
+          "40",
+          "四十",
+          "字以内",
+          "字内",
+          "不超过",
+          "characters",
+          "words"
+        ]
+      },
+      {
+        "label": "保留要点",
+        "desc": "保留最关键的事实",
+        "weight": 1,
+        "keywords": [
+          "关键",
+          "重要",
+          "要点",
+          "核心",
+          "key",
+          "important",
+          "essential"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t5",
+    "type": "text",
+    "difficulty": "入门",
+    "title": "菜谱变成了清单",
+    "left": "番茄炒蛋：先把三个鸡蛋打散加少许盐，两个番茄切块。热锅倒油，蛋液炒至凝固盛出。再放番茄炒出汁，加一勺糖，倒回鸡蛋翻炒均匀即可。",
+    "right": "购物清单\n☐ 鸡蛋 ×3\n☐ 番茄 ×2\n☐ 盐\n☐ 食用油\n☐ 糖",
+    "prompt": "从这份菜谱中提取所有需要购买的食材，做成带复选框的购物清单，标明数量。",
+    "refs": [
+      "把菜谱里用到的材料列成购物清单，每项前面加一个方框，有数量的写上数量。",
+      "列出这道菜需要买的东西，用 checkbox 清单的形式，注明用量。",
+      "Extract every ingredient from this recipe into a shopping checklist with checkboxes and quantities."
+    ],
+    "elements": [
+      {
+        "label": "提取食材",
+        "desc": "提取、列出需要的食材或材料",
+        "weight": 3,
+        "keywords": [
+          "食材",
+          "材料",
+          "配料",
+          "提取",
+          "列出",
+          "ingredient",
+          "extract",
+          "list"
+        ]
+      },
+      {
+        "label": "购物清单",
+        "desc": "做成购物清单",
+        "weight": 3,
+        "keywords": [
+          "购物",
+          "清单",
+          "要买",
+          "需要买",
+          "shopping",
+          "checklist"
+        ]
+      },
+      {
+        "label": "复选框",
+        "desc": "每项带复选框或方框",
+        "weight": 2,
+        "keywords": [
+          "复选框",
+          "方框",
+          "勾选",
+          "checkbox",
+          "☐",
+          "check box"
+        ]
+      },
+      {
+        "label": "数量",
+        "desc": "标明数量",
+        "weight": 2,
+        "keywords": [
+          "数量",
+          "用量",
+          "几个",
+          "quantit",
+          "amount"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t6",
+    "type": "text",
+    "difficulty": "入门",
+    "title": "一段话变成了对话",
+    "left": "小明想借小红的笔记复习，小红答应了，但要求他明天早上之前还回来，因为她自己也要用。",
+    "right": "小明：小红，能借我你的笔记复习一下吗？\n小红：可以啊。不过你明天早上之前一定要还我。\n小明：这么急？\n小红：嗯，我自己也要用。",
+    "prompt": "把这段叙述改写成小明和小红之间的对话，用剧本格式，每句话前面写说话人的名字。",
+    "refs": [
+      "将叙述转成两人的对话形式，像剧本一样，每行以角色名开头。",
+      "改写成小明和小红的对话，采用「名字：台词」的格式。",
+      "Rewrite this narration as a dialogue between Xiaoming and Xiaohong in script format, each line prefixed with the speaker's name."
+    ],
+    "elements": [
+      {
+        "label": "改成对话",
+        "desc": "叙述改写成对话",
+        "weight": 4,
+        "keywords": [
+          "对话",
+          "对白",
+          "交谈",
+          "dialogue",
+          "conversation"
+        ]
+      },
+      {
+        "label": "角色",
+        "desc": "小明和小红两个人",
+        "weight": 2,
+        "keywords": [
+          "小明",
+          "小红",
+          "两人",
+          "两个人",
+          "xiaoming",
+          "xiaohong",
+          "two"
+        ]
+      },
+      {
+        "label": "剧本格式",
+        "desc": "剧本格式，每句前写说话人名字",
+        "weight": 3,
+        "keywords": [
+          "剧本",
+          "名字",
+          "说话人",
+          "角色名",
+          "开头",
+          "script",
+          "speaker",
+          "name"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t7",
+    "type": "text",
+    "difficulty": "入门",
+    "title": "说明书被翻译成了大白话",
+    "left": "本产品采用高分子聚合物基材，具备优异的疏水性能，可有效阻隔液态水渗透，同时保持良好的水蒸气透过率。",
+    "right": "这个东西是用一种塑料做的，水泼上去不会湿，但是汗气能透出去，穿着不闷。",
+    "prompt": "把这段产品说明翻译成普通人能听懂的大白话，不要用任何专业术语，像跟朋友聊天一样。",
+    "refs": [
+      "用最通俗的语言解释这段话，去掉所有专业名词，口语化一点。",
+      "把说明书改写成外行也能看懂的口语，别用术语。",
+      "Rewrite this product description in plain everyday language with no technical terms, as if chatting with a friend."
+    ],
+    "elements": [
+      {
+        "label": "通俗化",
+        "desc": "改成大白话、通俗易懂",
+        "weight": 4,
+        "keywords": [
+          "大白话",
+          "通俗",
+          "白话",
+          "简单",
+          "普通人",
+          "外行",
+          "听懂",
+          "看懂",
+          "plain",
+          "simple",
+          "everyday",
+          "layman"
+        ]
+      },
+      {
+        "label": "去术语",
+        "desc": "不要用专业术语",
+        "weight": 3,
+        "keywords": [
+          "术语",
+          "专业名词",
+          "专业词",
+          "jargon",
+          "technical term"
+        ]
+      },
+      {
+        "label": "口语",
+        "desc": "像聊天一样的口语",
+        "weight": 2,
+        "keywords": [
+          "口语",
+          "聊天",
+          "朋友",
+          "casual",
+          "chat",
+          "friend",
+          "conversational"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t8",
+    "type": "text",
+    "difficulty": "进阶",
+    "title": "评论被打了标签",
+    "left": "1. 这家店的牛肉面汤头很浓，就是等了 40 分钟\n2. 服务员态度很差，再也不来了\n3. 环境干净，价格公道，推荐\n4. 一般般，没什么特别的",
+    "right": "1. 混合｜口味、等待时间\n2. 负面｜服务\n3. 正面｜环境、价格\n4. 中性｜无",
+    "prompt": "给每条评论打两个标签：情感(正面/负面/中性/混合)和涉及的方面(口味、服务、环境、价格、等待时间等)。每行输出格式为「序号. 情感｜方面」，多个方面用顿号分隔。",
+    "refs": [
+      "对每条评论标注情感倾向和评价维度，输出格式：编号. 情感｜维度，维度可以有多个。",
+      "逐条分类：先判断是正面、负面、中性还是混合，再列出评论涉及的方面，用竖线隔开。",
+      "Label each review with sentiment (positive/negative/neutral/mixed) and the aspects mentioned, formatted as 'number. sentiment | aspects'."
+    ],
+    "elements": [
+      {
+        "label": "情感标签",
+        "desc": "标注情感倾向",
+        "weight": 3,
+        "keywords": [
+          "情感",
+          "情绪",
+          "正面",
+          "负面",
+          "褒贬",
+          "sentiment"
+        ]
+      },
+      {
+        "label": "混合类别",
+        "desc": "情感包含混合这一类",
+        "weight": 2,
+        "keywords": [
+          "混合",
+          "中性",
+          "mixed",
+          "neutral"
+        ]
+      },
+      {
+        "label": "方面标签",
+        "desc": "标注评论涉及的方面",
+        "weight": 3,
+        "keywords": [
+          "方面",
+          "维度",
+          "涉及",
+          "口味",
+          "服务",
+          "aspect",
+          "dimension",
+          "category"
+        ]
+      },
+      {
+        "label": "输出格式",
+        "desc": "每行「序号. 情感｜方面」",
+        "weight": 2,
+        "keywords": [
+          "格式",
+          "竖线",
+          "｜",
+          "|",
+          "序号",
+          "编号",
+          "每行",
+          "format"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t9",
+    "type": "text",
+    "difficulty": "进阶",
+    "rightMono": true,
+    "title": "一段话变成了表格",
+    "left": "我们班有三个同学参加了比赛。张伟拿了数学一等奖，李娜拿了英语二等奖，王芳参加了物理竞赛但没有获奖。",
+    "right": "| 姓名 | 科目 | 奖项 |\n|---|---|---|\n| 张伟 | 数学 | 一等奖 |\n| 李娜 | 英语 | 二等奖 |\n| 王芳 | 物理 | 无 |",
+    "prompt": "把这段话整理成 Markdown 表格，三列分别是姓名、科目、奖项。没有获奖的填「无」。",
+    "refs": [
+      "用 Markdown 表格列出每个人的姓名、参赛科目和获奖情况，未获奖写「无」。",
+      "整理成表格，列：姓名、科目、奖项。用 markdown 语法。没得奖的标注为无。",
+      "Turn this into a Markdown table with columns name, subject and award; write 无 for no award."
+    ],
+    "elements": [
+      {
+        "label": "表格",
+        "desc": "整理成表格",
+        "weight": 4,
+        "keywords": [
+          "表格",
+          "表",
+          "table"
+        ]
+      },
+      {
+        "label": "Markdown",
+        "desc": "用 Markdown 语法",
+        "weight": 2,
+        "keywords": [
+          "markdown",
+          "md"
+        ]
+      },
+      {
+        "label": "列名",
+        "desc": "三列：姓名、科目、奖项",
+        "weight": 3,
+        "keywords": [
+          "姓名",
+          "科目",
+          "奖项",
+          "三列",
+          "列",
+          "column",
+          "name",
+          "subject",
+          "award"
+        ]
+      },
+      {
+        "label": "空值处理",
+        "desc": "没获奖的填「无」",
+        "weight": 1,
+        "keywords": [
+          "无",
+          "没有获奖",
+          "未获奖",
+          "没得奖",
+          "空",
+          "none",
+          "no award"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t10",
+    "type": "text",
+    "difficulty": "进阶",
+    "title": "同一件事，两个立场",
+    "left": "学校决定取消期中考试，改为平时作业和小测验计分。",
+    "right": "支持：减轻了学生一次性考试的压力，平时的努力能被持续看到，评价更公平。\n\n反对：小测验频繁反而让学生一直处于紧张状态，而且缺少一次系统复习整合知识的机会。",
+    "prompt": "针对这个决定，分别写出一条支持的理由和一条反对的理由，各用一段话，用「支持：」和「反对：」开头。",
+    "refs": [
+      "给出正反两方的观点，一段支持一段反对，分别以支持和反对作为开头标签。",
+      "从赞成和反对两个立场各写一段理由，标明立场。",
+      "Write one paragraph for and one against this decision, each starting with 支持： or 反对："
+    ],
+    "elements": [
+      {
+        "label": "正反两方",
+        "desc": "同时给出支持和反对的观点",
+        "weight": 4,
+        "keywords": [
+          "支持",
+          "反对",
+          "正反",
+          "赞成",
+          "两方",
+          "两个立场",
+          "利弊",
+          "for and against",
+          "pros",
+          "cons",
+          "both sides"
+        ]
+      },
+      {
+        "label": "各一条",
+        "desc": "每方一条理由、一段话",
+        "weight": 2,
+        "keywords": [
+          "一条",
+          "一段",
+          "各",
+          "一个理由",
+          "one",
+          "each"
+        ]
+      },
+      {
+        "label": "开头标签",
+        "desc": "用「支持：」「反对：」开头",
+        "weight": 2,
+        "keywords": [
+          "开头",
+          "标签",
+          "标明",
+          "冒号",
+          "：",
+          "start with",
+          "label",
+          "prefix"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t11",
+    "type": "text",
+    "difficulty": "进阶",
+    "title": "回答里多了追问",
+    "left": "我想学编程，应该从哪门语言开始？",
+    "right": "这取决于你的目标。在推荐之前，我想先了解两件事：\n1. 你学编程主要想做什么？比如做网站、分析数据、做游戏，还是只是了解一下。\n2. 你每周大概能投入多少时间？\n\n告诉我这些，我就能给你更贴合的建议。",
+    "prompt": "你是一位编程导师。用户提问时，不要直接给出答案，先反问 2 个能帮你了解用户情况的问题，然后说明了解之后会给出建议。",
+    "refs": [
+      "扮演编程老师。不要马上回答，先问用户两个澄清问题来了解他的目标和时间，再承诺之后给建议。",
+      "作为导师，回复时先提两个问题弄清楚用户的需求，暂时不给具体推荐。",
+      "You are a coding mentor. Don't answer directly; first ask two clarifying questions about the user's goals, then say you'll advise after."
+    ],
+    "elements": [
+      {
+        "label": "角色",
+        "desc": "编程导师或老师",
+        "weight": 2,
+        "keywords": [
+          "导师",
+          "老师",
+          "教练",
+          "mentor",
+          "tutor",
+          "teacher"
+        ]
+      },
+      {
+        "label": "先不回答",
+        "desc": "不直接给出答案",
+        "weight": 3,
+        "keywords": [
+          "不要直接",
+          "不直接",
+          "先不",
+          "不要马上",
+          "暂时不",
+          "先别",
+          "don't answer",
+          "not answer",
+          "before answering",
+          "instead of"
+        ]
+      },
+      {
+        "label": "反问",
+        "desc": "先反问、追问、提出澄清问题",
+        "weight": 3,
+        "keywords": [
+          "反问",
+          "追问",
+          "先问",
+          "提问",
+          "澄清",
+          "了解",
+          "ask",
+          "clarif",
+          "question"
+        ]
+      },
+      {
+        "label": "数量",
+        "desc": "问 2 个问题",
+        "weight": 1,
+        "keywords": [
+          "两个",
+          "2个",
+          "2 个",
+          "两条",
+          "two"
+        ]
+      },
+      {
+        "label": "承诺后续",
+        "desc": "说明了解后会给建议",
+        "weight": 1,
+        "keywords": [
+          "之后",
+          "然后",
+          "再给",
+          "再推荐",
+          "会给",
+          "after",
+          "then"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t12",
+    "type": "text",
+    "difficulty": "进阶",
+    "title": "句子被改成了主动语态和短句",
+    "left": "该报告是由市场部在上季度末完成的，其中所提出的三项建议已经被管理层采纳，并将在下个财年被逐步实施。",
+    "right": "市场部在上季度末完成了这份报告。报告提出三项建议。管理层已经采纳，并将在下个财年逐步实施。",
+    "prompt": "把这段话改成主动语态，拆成几个短句，每句不超过 20 个字，意思不变。",
+    "refs": [
+      "去掉被动句，改为主动表达，并把长句拆短，每句 20 字以内，保留原意。",
+      "改写：主动语态，短句，每句不超过二十字，不改变意思。",
+      "Rewrite in active voice, split into short sentences of no more than 20 characters each, keeping the meaning."
+    ],
+    "elements": [
+      {
+        "label": "主动语态",
+        "desc": "改成主动语态，去掉被动句",
+        "weight": 4,
+        "keywords": [
+          "主动",
+          "被动",
+          "active",
+          "passive"
+        ]
+      },
+      {
+        "label": "拆短句",
+        "desc": "拆成几个短句",
+        "weight": 3,
+        "keywords": [
+          "短句",
+          "拆",
+          "拆分",
+          "分成",
+          "split",
+          "short sentence"
+        ]
+      },
+      {
+        "label": "字数",
+        "desc": "每句不超过 20 字",
+        "weight": 2,
+        "keywords": [
+          "20",
+          "二十",
+          "不超过",
+          "以内",
+          "字",
+          "characters"
+        ]
+      },
+      {
+        "label": "保留原意",
+        "desc": "意思不变",
+        "weight": 1,
+        "keywords": [
+          "意思不变",
+          "保留",
+          "原意",
+          "不改变",
+          "meaning",
+          "keep"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t13",
+    "type": "text",
+    "difficulty": "进阶",
+    "rightMono": true,
+    "title": "自然语言变成了代码",
+    "left": "给我一个函数，输入一个整数列表，返回其中所有偶数的平方和。",
+    "right": "def sum_even_squares(nums: list[int]) -> int:\n    \"\"\"返回列表中所有偶数的平方和。\"\"\"\n    return sum(n * n for n in nums if n % 2 == 0)",
+    "prompt": "用 Python 实现这个需求。要求：加类型注解，写一行中文 docstring，只输出代码，不要解释。",
+    "refs": [
+      "写成 Python 函数，带 type hints 和简短的中文文档字符串，除了代码不要输出别的。",
+      "Python 实现，函数签名要有类型标注，加一句中文注释说明，只给代码。",
+      "Implement in Python with type annotations and a one-line Chinese docstring. Output code only, no explanation."
+    ],
+    "elements": [
+      {
+        "label": "语言",
+        "desc": "用 Python",
+        "weight": 3,
+        "keywords": [
+          "python",
+          "py"
+        ]
+      },
+      {
+        "label": "类型注解",
+        "desc": "加类型注解",
+        "weight": 2,
+        "keywords": [
+          "类型",
+          "注解",
+          "标注",
+          "type hint",
+          "annotation",
+          "typing"
+        ]
+      },
+      {
+        "label": "docstring",
+        "desc": "写中文 docstring",
+        "weight": 2,
+        "keywords": [
+          "docstring",
+          "文档字符串",
+          "注释",
+          "说明",
+          "中文"
+        ]
+      },
+      {
+        "label": "只输出代码",
+        "desc": "只输出代码，不要解释",
+        "weight": 3,
+        "keywords": [
+          "只输出",
+          "只给",
+          "只返回",
+          "不要解释",
+          "不要输出别的",
+          "除了代码",
+          "code only",
+          "only code",
+          "no explanation"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t14",
+    "type": "text",
+    "difficulty": "进阶",
+    "title": "错误被指出来了，但没有改",
+    "left": "我们昨天去了公园，天气非长好，我和朋友们玩的很开心，还拍了很多照片。",
+    "right": "发现 2 处错误：\n1. 「非长」应为「非常」\n2. 「玩的很开心」应为「玩得很开心」",
+    "prompt": "找出这段话里的错别字和语法错误，逐条列出错误和正确写法，不要输出改好的全文。",
+    "refs": [
+      "检查错别字和用词错误，只列出错误清单和修改建议，不要重写整段话。",
+      "校对这段文字，指出每一处错误并给出正确写法，但不要直接给出修改后的版本。",
+      "Find the typos and grammar mistakes, list each with its correction, and do not output the corrected full text."
+    ],
+    "elements": [
+      {
+        "label": "找错",
+        "desc": "找出错别字和语法错误",
+        "weight": 4,
+        "keywords": [
+          "错别字",
+          "错误",
+          "错字",
+          "语法",
+          "校对",
+          "检查",
+          "typo",
+          "mistake",
+          "error",
+          "proofread"
+        ]
+      },
+      {
+        "label": "逐条列出",
+        "desc": "逐条列出错误和正确写法",
+        "weight": 3,
+        "keywords": [
+          "逐条",
+          "列出",
+          "清单",
+          "每一处",
+          "正确写法",
+          "修改建议",
+          "list",
+          "each",
+          "correction"
+        ]
+      },
+      {
+        "label": "不要全文",
+        "desc": "不要输出改好的全文",
+        "weight": 3,
+        "keywords": [
+          "不要输出",
+          "不要重写",
+          "不要直接",
+          "不要给出",
+          "全文",
+          "整段",
+          "do not",
+          "don't",
+          "full text"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t15",
+    "type": "text",
+    "difficulty": "进阶",
+    "title": "一句话被扩成了三个版本",
+    "left": "新品上市，限时八折。",
+    "right": "【微信朋友圈】新品终于来了！这周下单直接打八折，手慢无～\n\n【公司官网】我们的新品现已正式上市。即日起至本周日，全场享受 8 折优惠。\n\n【短信】新品上市限时8折，本周日截止，详情点击链接。",
+    "prompt": "把这句广告语分别改写成三个版本：微信朋友圈、公司官网、短信。每个版本前用【渠道名】标注，语气要符合各自的平台。",
+    "refs": [
+      "为三个渠道各写一版文案：朋友圈、官网、短信，用方括号标出渠道，语气按平台调整。",
+      "同一句宣传语写三种风格：朋友圈要活泼，官网要正式，短信要简短，每段开头标明渠道。",
+      "Rewrite this ad line for three channels — WeChat Moments, official website, SMS — each tagged with 【channel】 and matching that platform's tone."
+    ],
+    "elements": [
+      {
+        "label": "三个版本",
+        "desc": "改写成三个版本",
+        "weight": 3,
+        "keywords": [
+          "三个",
+          "三版",
+          "三种",
+          "3个",
+          "3 个",
+          "三条",
+          "three"
+        ]
+      },
+      {
+        "label": "渠道",
+        "desc": "朋友圈、官网、短信三个渠道",
+        "weight": 3,
+        "keywords": [
+          "朋友圈",
+          "官网",
+          "短信",
+          "渠道",
+          "平台",
+          "wechat",
+          "website",
+          "sms",
+          "channel"
+        ]
+      },
+      {
+        "label": "语气匹配",
+        "desc": "语气符合各自平台",
+        "weight": 2,
+        "keywords": [
+          "语气",
+          "风格",
+          "符合",
+          "调整",
+          "活泼",
+          "正式",
+          "tone",
+          "style",
+          "match"
+        ]
+      },
+      {
+        "label": "标注渠道",
+        "desc": "每版前用【渠道名】标注",
+        "weight": 2,
+        "keywords": [
+          "【",
+          "标注",
+          "标出",
+          "标明",
+          "方括号",
+          "开头",
+          "tag",
+          "label",
+          "bracket"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t16",
+    "type": "text",
+    "difficulty": "进阶",
+    "title": "回答变成了苏格拉底式",
+    "left": "为什么天空是蓝色的？",
+    "right": "好问题。先想一想：阳光看起来是白色的，但你知道白光其实是由什么组成的吗？如果不同颜色的光遇到空气中的微小分子时，被散射的程度不一样，你觉得哪种颜色会被散得更厉害？",
+    "prompt": "你是一位物理老师，用苏格拉底式提问的方法回答学生：不直接给出答案，而是通过 2 到 3 个引导性的问题，让学生自己推理出结论。",
+    "refs": [
+      "扮演物理老师，采用启发式教学，不直接解释，只用几个引导问题带着学生自己想明白。",
+      "用提问代替讲解：不要说答案，提两三个循序渐进的问题引导学生推理。",
+      "You are a physics teacher using the Socratic method: don't give the answer, ask 2–3 guiding questions that lead the student to reason it out."
+    ],
+    "elements": [
+      {
+        "label": "角色",
+        "desc": "物理老师",
+        "weight": 2,
+        "keywords": [
+          "物理",
+          "老师",
+          "教师",
+          "physics",
+          "teacher"
+        ]
+      },
+      {
+        "label": "苏格拉底式",
+        "desc": "苏格拉底式、启发式、用提问引导",
+        "weight": 4,
+        "keywords": [
+          "苏格拉底",
+          "启发",
+          "引导",
+          "提问",
+          "反问",
+          "socratic",
+          "guiding",
+          "lead"
+        ]
+      },
+      {
+        "label": "不给答案",
+        "desc": "不直接给出答案",
+        "weight": 3,
+        "keywords": [
+          "不直接",
+          "不要说答案",
+          "不给答案",
+          "不解释",
+          "不要讲解",
+          "don't give",
+          "not give",
+          "without answering"
+        ]
+      },
+      {
+        "label": "数量",
+        "desc": "2 到 3 个问题",
+        "weight": 1,
+        "keywords": [
+          "两",
+          "三",
+          "2",
+          "3",
+          "几个",
+          "two",
+          "three"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t17",
+    "type": "text",
+    "difficulty": "困难",
+    "rightMono": true,
+    "title": "文字变成了日程 JSON",
+    "left": "下周二下午三点跟李老师开会讨论毕业论文，大概一个小时。周四上午十点有英语课，记得提前交作业。",
+    "right": "[\n  {\"title\": \"与李老师讨论毕业论文\", \"day\": \"周二\", \"start\": \"15:00\", \"duration_min\": 60, \"note\": null},\n  {\"title\": \"英语课\", \"day\": \"周四\", \"start\": \"10:00\", \"duration_min\": null, \"note\": \"提前交作业\"}\n]",
+    "prompt": "把这段话里的日程提取成 JSON 数组。每个事件包含 title、day、start(24 小时制 HH:MM)、duration_min(分钟数，未知填 null)、note(备注，没有填 null)。只输出 JSON。",
+    "refs": [
+      "抽取所有日程事件为 JSON 数组，字段：title、day、start(24小时制)、duration_min、note，缺失的字段用 null，不要输出多余内容。",
+      "解析文本中的安排，输出 JSON 列表，每项有标题、星期、开始时间(HH:MM)、时长分钟、备注，没有的填 null。只要 JSON。",
+      "Extract the events into a JSON array with title, day, start (24h HH:MM), duration_min and note; use null when unknown. Output JSON only."
+    ],
+    "elements": [
+      {
+        "label": "提取日程",
+        "desc": "提取日程、事件、安排",
+        "weight": 3,
+        "keywords": [
+          "日程",
+          "事件",
+          "安排",
+          "提取",
+          "抽取",
+          "解析",
+          "event",
+          "schedule",
+          "extract"
+        ]
+      },
+      {
+        "label": "JSON 数组",
+        "desc": "输出 JSON 数组或列表",
+        "weight": 3,
+        "keywords": [
+          "json"
+        ]
+      },
+      {
+        "label": "字段",
+        "desc": "title、day、start、duration_min、note",
+        "weight": 3,
+        "keywords": [
+          "title",
+          "day",
+          "start",
+          "duration",
+          "note",
+          "标题",
+          "星期",
+          "开始时间",
+          "时长",
+          "备注",
+          "字段"
+        ]
+      },
+      {
+        "label": "时间格式",
+        "desc": "24 小时制 HH:MM",
+        "weight": 2,
+        "keywords": [
+          "24",
+          "二十四",
+          "hh:mm",
+          "小时制"
+        ]
+      },
+      {
+        "label": "空值",
+        "desc": "未知的填 null",
+        "weight": 2,
+        "keywords": [
+          "null",
+          "空",
+          "未知",
+          "缺失",
+          "没有的",
+          "unknown",
+          "missing"
+        ]
+      },
+      {
+        "label": "只输出 JSON",
+        "desc": "只输出 JSON，无多余内容",
+        "weight": 1,
+        "keywords": [
+          "只输出",
+          "只要",
+          "只返回",
+          "不要输出多余",
+          "不要解释",
+          "only",
+          "nothing else"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t18",
+    "type": "text",
+    "difficulty": "困难",
+    "title": "回复被限制了内容范围",
+    "left": "你们的会员多少钱一年？另外我想问一下，隔壁那家店是不是要倒闭了？",
+    "right": "您好！我们的年度会员是 199 元/年，包含全部课程和资料下载。\n\n关于其他店铺的情况，抱歉我这边没有相关信息，无法回答。还有什么关于我们服务的问题，欢迎随时问我。",
+    "prompt": "你是某在线教育平台的客服。年度会员 199 元，含全部课程和资料下载。只回答与本平台服务有关的问题，涉及其他公司或与服务无关的问题要礼貌拒绝，并引导用户继续问服务相关的问题。",
+    "refs": [
+      "扮演教育平台客服，会员价 199 元一年含所有课程。与平台无关的问题礼貌地拒绝回答，然后把话题引回平台服务。",
+      "客服角色，掌握定价信息(199/年)。不回答关于其他公司的问题，用礼貌的方式说明无法回答，并邀请用户继续咨询。",
+      "You are customer support for an online education platform (annual membership 199 yuan, all courses included). Only answer questions about our service; politely decline anything about other companies and steer back."
+    ],
+    "elements": [
+      {
+        "label": "角色",
+        "desc": "在线教育平台的客服",
+        "weight": 2,
+        "keywords": [
+          "客服",
+          "客户服务",
+          "support",
+          "customer service"
+        ]
+      },
+      {
+        "label": "背景信息",
+        "desc": "会员 199 元/年，含全部课程",
+        "weight": 3,
+        "keywords": [
+          "199",
+          "会员",
+          "价格",
+          "定价",
+          "membership",
+          "price"
+        ]
+      },
+      {
+        "label": "范围限制",
+        "desc": "只回答与本平台服务有关的问题",
+        "weight": 3,
+        "keywords": [
+          "只回答",
+          "只答",
+          "范围",
+          "有关",
+          "相关",
+          "无关",
+          "只涉及",
+          "only answer",
+          "scope",
+          "related"
+        ]
+      },
+      {
+        "label": "礼貌拒绝",
+        "desc": "无关问题礼貌拒绝",
+        "weight": 3,
+        "keywords": [
+          "拒绝",
+          "不回答",
+          "无法回答",
+          "礼貌",
+          "婉拒",
+          "decline",
+          "refuse",
+          "polite"
+        ]
+      },
+      {
+        "label": "引导回归",
+        "desc": "引导用户继续问服务相关的问题",
+        "weight": 1,
+        "keywords": [
+          "引导",
+          "引回",
+          "继续",
+          "欢迎",
+          "steer",
+          "redirect",
+          "invite"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t19",
+    "type": "text",
+    "difficulty": "困难",
+    "title": "输出带上了自我检查",
+    "left": "一个长方形的周长是 24 厘米，长是宽的 2 倍，求面积。",
+    "right": "设宽为 x，则长为 2x。周长 2(x + 2x) = 6x = 24，得 x = 4。\n长 = 8 cm，宽 = 4 cm，面积 = 8 × 4 = 32 cm²。\n\n检查：周长 = 2 × (8 + 4) = 24 ✓，长是宽的 2 倍 ✓。\n\n答案：32 平方厘米",
+    "prompt": "一步一步解这道题。解完之后，用「检查：」开头，把结果代回题目条件逐一验证，最后单独一行给出「答案：」。",
+    "refs": [
+      "逐步推导，做完后回代验证每个条件，标注检查，最后一行以答案：开头写最终结果。",
+      "写出解题步骤；然后加一段自我检查，把答案代回原题核对；最后一行单独写答案。",
+      "Solve step by step. Then, under 检查：, verify the result against each condition. End with a separate 答案： line."
+    ],
+    "elements": [
+      {
+        "label": "分步",
+        "desc": "一步一步解题",
+        "weight": 3,
+        "keywords": [
+          "一步一步",
+          "逐步",
+          "步骤",
+          "分步",
+          "推导",
+          "step by step",
+          "steps"
+        ]
+      },
+      {
+        "label": "自我检查",
+        "desc": "解完后代回验证",
+        "weight": 4,
+        "keywords": [
+          "检查",
+          "验证",
+          "核对",
+          "代回",
+          "回代",
+          "check",
+          "verify"
+        ]
+      },
+      {
+        "label": "逐条验证",
+        "desc": "对题目条件逐一验证",
+        "weight": 1,
+        "keywords": [
+          "逐一",
+          "每个条件",
+          "各条件",
+          "each condition",
+          "every condition"
+        ]
+      },
+      {
+        "label": "答案行",
+        "desc": "最后单独一行「答案：」",
+        "weight": 2,
+        "keywords": [
+          "答案",
+          "最后一行",
+          "单独",
+          "final answer",
+          "last line"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t20",
+    "type": "text",
+    "difficulty": "困难",
+    "title": "诗被改写了，但格式保留",
+    "left": "床前明月光，\n疑是地上霜。\n举头望明月，\n低头思故乡。",
+    "right": "屏前蓝光亮，\n疑是天将亮。\n抬头看闹钟，\n低头刷手机。",
+    "prompt": "仿写这首诗，主题改成现代人熬夜玩手机。保持四句、每句五个字、原诗的句式结构，最好押韵。",
+    "refs": [
+      "用同样的格式(四句五言)写一首讲熬夜刷手机的仿作，句式尽量对应原诗。",
+      "把这首诗改编成现代版，主题是深夜玩手机，保留五言四句的形式和结构。",
+      "Parody this poem on the theme of staying up late on a phone; keep four lines of five characters and the original sentence structure."
+    ],
+    "elements": [
+      {
+        "label": "仿写",
+        "desc": "仿写、改编、戏仿",
+        "weight": 3,
+        "keywords": [
+          "仿写",
+          "仿作",
+          "改编",
+          "改写",
+          "戏仿",
+          "现代版",
+          "parody",
+          "rewrite",
+          "adapt"
+        ]
+      },
+      {
+        "label": "主题",
+        "desc": "现代人熬夜玩手机",
+        "weight": 3,
+        "keywords": [
+          "手机",
+          "熬夜",
+          "深夜",
+          "刷",
+          "phone",
+          "late"
+        ]
+      },
+      {
+        "label": "格式",
+        "desc": "四句、每句五字",
+        "weight": 3,
+        "keywords": [
+          "四句",
+          "五言",
+          "五个字",
+          "五字",
+          "4句",
+          "four lines",
+          "five characters"
+        ]
+      },
+      {
+        "label": "句式对应",
+        "desc": "保持原诗的句式结构",
+        "weight": 1,
+        "keywords": [
+          "句式",
+          "结构",
+          "对应",
+          "格式",
+          "形式",
+          "structure",
+          "form"
+        ]
+      },
+      {
+        "label": "押韵",
+        "desc": "押韵",
+        "weight": 1,
+        "keywords": [
+          "押韵",
+          "韵",
+          "rhyme"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t21",
+    "type": "text",
+    "difficulty": "困难",
+    "rightMono": true,
+    "title": "问题被分成了几类，还编了号",
+    "left": "登录不上去\n怎么退款\n页面一直转圈\n我要改绑定的手机号\n为什么扣了我两次钱\n忘记密码了",
+    "right": "账号问题\n  A1 登录不上去\n  A2 我要改绑定的手机号\n  A3 忘记密码了\n支付问题\n  B1 怎么退款\n  B2 为什么扣了我两次钱\n技术问题\n  C1 页面一直转圈",
+    "prompt": "把这些用户问题按「账号问题、支付问题、技术问题」三类分组，每类下缩进列出，并给每条编号，编号用类别字母加序号，如 A1、B2。",
+    "refs": [
+      "分成账号、支付、技术三组，组内每条缩进并用字母加数字编号(A1、A2、B1…)。",
+      "按三个类别归类：账号、支付、技术。类别名单独一行，下面缩进列问题，编号格式为字母+序号。",
+      "Group these into 账号问题, 支付问题 and 技术问题; indent items under each group and number them with the group letter plus an index, like A1, B2."
+    ],
+    "elements": [
+      {
+        "label": "分类",
+        "desc": "按类别分组",
+        "weight": 3,
+        "keywords": [
+          "分类",
+          "分组",
+          "归类",
+          "分成",
+          "类别",
+          "group",
+          "categor",
+          "classif"
+        ]
+      },
+      {
+        "label": "三个类别",
+        "desc": "账号、支付、技术三类",
+        "weight": 3,
+        "keywords": [
+          "账号",
+          "支付",
+          "技术",
+          "三类",
+          "三组",
+          "三个",
+          "account",
+          "payment",
+          "technical"
+        ]
+      },
+      {
+        "label": "缩进",
+        "desc": "每类下缩进列出",
+        "weight": 2,
+        "keywords": [
+          "缩进",
+          "下面",
+          "之下",
+          "indent",
+          "under"
+        ]
+      },
+      {
+        "label": "编号规则",
+        "desc": "字母加序号编号，如 A1、B2",
+        "weight": 3,
+        "keywords": [
+          "编号",
+          "字母",
+          "序号",
+          "a1",
+          "b1",
+          "b2",
+          "number",
+          "letter"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "t22",
+    "type": "text",
+    "difficulty": "困难",
+    "title": "同一个意思，说给两个人听",
+    "left": "项目延期两周。",
+    "right": "给客户：\n感谢您一直以来的支持。为了确保交付质量，我们计划将项目完成时间调整至两周后。期间我们会持续同步进展，感谢您的理解。\n\n给团队：\n项目往后推两周。这两周把测试覆盖补上，周三前每人把手头的阻塞项发我。",
+    "prompt": "把这条消息写成两个版本：一个发给客户，一个发给内部团队。给客户的要正式、有安抚、不暴露内部问题；给团队的要直接、简短、带具体的下一步行动。分别用「给客户：」和「给团队：」开头。",
+    "refs": [
+      "写两版通知：客户版正式委婉，只说调整和保证；团队版简洁直接，附具体行动项。各自用开头标签区分。",
+      "同一个消息对外和对内两种写法：对外正式、不提内部原因；对内直白、有明确的下一步。标明给客户和给团队。",
+      "Write two versions: one for the client (formal, reassuring, no internal details) and one for the team (direct, brief, with concrete next steps), prefixed 给客户： and 给团队："
+    ],
+    "elements": [
+      {
+        "label": "两个版本",
+        "desc": "给客户和给团队两个版本",
+        "weight": 4,
+        "keywords": [
+          "客户",
+          "团队",
+          "两个版本",
+          "两版",
+          "对外",
+          "对内",
+          "两种",
+          "client",
+          "team",
+          "two versions"
+        ]
+      },
+      {
+        "label": "客户语气",
+        "desc": "对客户正式、有安抚",
+        "weight": 2,
+        "keywords": [
+          "正式",
+          "安抚",
+          "委婉",
+          "礼貌",
+          "formal",
+          "reassur",
+          "polite"
+        ]
+      },
+      {
+        "label": "不暴露内部",
+        "desc": "不暴露内部问题",
+        "weight": 2,
+        "keywords": [
+          "不暴露",
+          "不提",
+          "不透露",
+          "内部问题",
+          "内部原因",
+          "internal",
+          "not mention",
+          "no internal"
+        ]
+      },
+      {
+        "label": "团队语气",
+        "desc": "对团队直接、简短",
+        "weight": 2,
+        "keywords": [
+          "直接",
+          "简短",
+          "直白",
+          "简洁",
+          "direct",
+          "brief",
+          "short"
+        ]
+      },
+      {
+        "label": "行动项",
+        "desc": "团队版带具体的下一步行动",
+        "weight": 2,
+        "keywords": [
+          "行动",
+          "下一步",
+          "具体",
+          "任务",
+          "action",
+          "next step"
+        ]
+      }
     ]
   }
 ]
