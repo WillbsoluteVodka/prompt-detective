@@ -2476,11 +2476,13 @@ function renderControls(){
   $('guess').disabled = rd.phase!=='running';
   $('submit').disabled = !done && (rd.phase!=='running' || units($('guess').value) < 3);
   $('submit').textContent = done ? '揭晓答案' : '提交';
+  $('submit').hidden = done && !bank.every(x=>round(x).phase==='done');
   renderTimes();
 }
 function renderResults(){
   const q = bank[state.qi], rd = round(q);
-  $('results').hidden = !rd.res;
+  const allDone = bank.every(x=>round(x).phase==='done');
+  $('results').hidden = !(rd.res && allDone);
   if(rd.res) renderResult($('res'), q, rd.res, rd.text, rd.time);
 }
 function renderQuestion(){
@@ -2516,7 +2518,12 @@ $('submit').addEventListener('click', async ()=>{
   rd.time = Date.now()-rd.start; rd.text = $('guess').value.trim();
   rd.res = await scoreGuess(q, rd.text); rd.phase = 'done';
   saveScore(q, rd);
-  if(bank[state.qi]===q){ renderNav(); renderControls(); renderResults(); }
+  // 提交后直接进入下一道还没做的题；全部做完才停在当前题
+  const next = bank.findIndex((x,i)=> i>state.qi && round(x).phase!=='done');
+  const any = bank.findIndex(x=> round(x).phase!=='done');
+  const target = next>=0 ? next : any;
+  if(target>=0){ state.qi = target; const nr=round(bank[target]); nr.phase='running'; nr.start=Date.now(); }
+  renderQuestion();
 });
 function openReveal(q){
   state.revealed[q.id] = true;
