@@ -120,8 +120,8 @@ li .mark{flex:none;width:1.2em;font-weight:700}
 <template id="svg-cat-flat"><svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="220" fill="#f3e6cf"/><ellipse cx="160" cy="196" rx="80" ry="8" fill="#d9c7a6"/><path d="M215 180c40 0 44-50 20-58" fill="none" stroke="#e8893a" stroke-width="12" stroke-linecap="round"/><ellipse cx="160" cy="150" rx="52" ry="46" fill="#e8893a"/><circle cx="160" cy="84" r="34" fill="#e8893a"/><polygon points="132,66 136,34 156,56" fill="#e8893a"/><polygon points="188,66 184,34 164,56" fill="#e8893a"/><circle cx="148" cy="82" r="4" fill="#2b2118"/><circle cx="172" cy="82" r="4" fill="#2b2118"/><polygon points="156,92 164,92 160,98" fill="#c45a5a"/><ellipse cx="160" cy="160" rx="24" ry="28" fill="#fbe3c4"/></svg></template>
 <template id="svg-cat-blueprint"><svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="220" fill="#1c4a9a"/><g stroke="#ffffff" stroke-opacity=".18" stroke-width="1"><path d="M0 20H320M0 40H320M0 60H320M0 80H320M0 100H320M0 120H320M0 140H320M0 160H320M0 180H320M0 200H320"/><path d="M20 0V220M40 0V220M60 0V220M80 0V220M100 0V220M120 0V220M140 0V220M160 0V220M180 0V220M200 0V220M220 0V220M240 0V220M260 0V220M280 0V220M300 0V220"/></g><g fill="none" stroke="#fff" stroke-width="2"><path d="M215 180c40 0 44-50 20-58" stroke-linecap="round"/><ellipse cx="160" cy="150" rx="52" ry="46"/><circle cx="160" cy="84" r="34"/><polygon points="132,66 136,34 156,56"/><polygon points="188,66 184,34 164,56"/><circle cx="148" cy="82" r="4"/><circle cx="172" cy="82" r="4"/><polygon points="156,92 164,92 160,98"/><ellipse cx="160" cy="160" rx="24" ry="28"/></g><g stroke="#fff" stroke-width="1" fill="none"><path d="M70 34V196M64 34H76M64 196H76"/><path d="M108 210H212M108 204V216M212 204V216"/></g><g fill="#fff" font-family="monospace" font-size="10"><text x="40" y="118">162</text><text x="150" y="207" dy="-1">104</text><text x="236" y="24">CAT-01 · 1:4</text></g></svg></template>
 
-<!-- 每周换题时改这里的 week，学生端会自动清空上周进度 -->
-<script type="application/json" id="bank" data-week="2026-W41">
+<!-- 每周换题时改 week。data-reset="all"：学生需重新登录；data-reset="progress"：只清进度、保留登录 -->
+<script type="application/json" id="bank" data-week="2026-W41" data-reset="all">
 [
   {
     "id": "t1",
@@ -2365,8 +2365,12 @@ try{
   const saved = JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
   if(saved && Date.now()-saved.at < SESSION_TTL){
     state = saved.state;
-    // 题库换了版本：保留登录，清空进度
-    if(saved.week !== WEEK){ state.rounds = {}; state.revealed = {}; state.qi = 0; }
+    // 题库换了版本：按 data-reset 决定是全部清空还是只清进度
+    if(saved.week !== WEEK){
+      const all = document.getElementById('bank').dataset.reset !== 'progress';
+      state = all ? {qi:0, rounds:{}, revealed:{}, cls:'', name:''} : Object.assign(state, {qi:0, rounds:{}, revealed:{}});
+      if(all) localStorage.removeItem(SESSION_KEY);
+    }
     // 刷新时正在做的题，计时从现在重新开始
     Object.values(state.rounds).forEach(r=>{ if(r.phase==='running') r.start=Date.now(); });
   }else localStorage.removeItem(SESSION_KEY);
