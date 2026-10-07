@@ -109,8 +109,9 @@ li .mark{flex:none;width:1.2em;font-weight:700}
 <div id="shade">
   <form id="startForm">
     <input id="cls" placeholder="班级" autocomplete="off" required>
+    <input id="sid" placeholder="学号" autocomplete="off" required>
     <input id="nm" placeholder="姓名" autocomplete="off" required>
-    <button class="primary" id="startBtn" type="submit">开始</button>
+    <button class="primary" id="startBtn" type="submit" disabled>开始</button>
   </form>
 </div>
 
@@ -1276,17 +1277,18 @@ const W = {sem:.35, elem:.45, len:.20};
 const $ = id => document.getElementById(id);
 
 /* ---------- 状态 ---------- */
-let state = {qi:0, rounds:{}, revealed:{}, cls:'', name:''};
+let state = {qi:0, rounds:{}, revealed:{}, cls:'', sid:'', name:''};
 // 会话保存在 localStorage，7 天内不用重新登录，进度也保留
 const SESSION_KEY = 'prompt-detective-session', SESSION_TTL = 7*24*60*60*1000;
 try{
   const saved = JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
   if(saved && Date.now()-saved.at < SESSION_TTL){
     state = saved.state;
+    if(!state.sid){ state = {qi:0, rounds:{}, revealed:{}, cls:'', sid:'', name:''}; }
     // 题库换了版本：按 data-reset 决定是全部清空还是只清进度
     if(saved.week !== WEEK){
       const all = document.getElementById('bank').dataset.reset !== 'progress';
-      state = all ? {qi:0, rounds:{}, revealed:{}, cls:'', name:''} : Object.assign(state, {qi:0, rounds:{}, revealed:{}});
+      state = all ? {qi:0, rounds:{}, revealed:{}, cls:'', sid:'', name:''} : Object.assign(state, {qi:0, rounds:{}, revealed:{}});
       if(all) localStorage.removeItem(SESSION_KEY);
     }
     // 刷新时正在做的题，计时从现在重新开始
@@ -1304,8 +1306,8 @@ async function saveScore(q, rd){
   const r = rd.res, pct = x => Math.round(x*100);
   try{
     // 同一学生同一题重复提交时覆盖旧记录
-    await fetch(SB_URL+'/rest/v1/scores?on_conflict=week,class_name,student_name,question_id',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,Prefer:'return=minimal,resolution=merge-duplicates'},
-      body:JSON.stringify({week:WEEK, class_name:state.cls, student_name:state.name, question_id:q.id, score:r.total, sem:pct(r.sem), elem:pct(r.elem), len:pct(r.len), time_ms:rd.time, answer:rd.text})});
+    await fetch(SB_URL+'/rest/v1/scores?on_conflict=week,student_id,question_id',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,Prefer:'return=minimal,resolution=merge-duplicates'},
+      body:JSON.stringify({week:WEEK, class_name:state.cls, student_id:state.sid, student_name:state.name, question_id:q.id, score:r.total, sem:pct(r.sem), elem:pct(r.elem), len:pct(r.len), time_ms:rd.time, answer:rd.text})});
   }catch(e){ rd.saved=false; }
 }
 
@@ -1402,7 +1404,7 @@ function fillPane(el, q, side){
 function renderNav(){
   $('nav').innerHTML = bank.map((q,i)=>`<button data-i="${i}" aria-current="${i===state.qi}">${i+1}</button>`).join('');
   const sum = bank.reduce((a,q)=>{ const r=round(q).res; return a+(r?r.total:0); },0);
-  $('totalScore').textContent = (state.name? state.cls+' '+state.name+' · ':'') + sum;
+  $('totalScore').textContent = (state.name? state.cls+' '+state.sid+' '+state.name+' · ':'') + sum;
   $('logout').hidden = !state.name;
 }
 function renderTimes(){
@@ -1445,10 +1447,11 @@ function renderResult(el, q, r, text, time){
 
 /* ---------- 事件 ---------- */
 $('nav').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return; state.qi=+b.dataset.i; const rd=round(bank[state.qi]); if(state.name && rd.phase==='idle'){ rd.phase='running'; rd.start=Date.now(); } persist(); renderQuestion(); });
+['cls','sid','nm'].forEach(id=>$(id).addEventListener('input',()=>{ $('startBtn').disabled = !['cls','sid','nm'].every(i=>$(i).value.trim()); }));
 $('startForm').addEventListener('submit', e=>{
   e.preventDefault();
-  state.cls = $('cls').value.trim(); state.name = $('nm').value.trim();
-  if(!state.cls || !state.name) return;
+  state.cls = $('cls').value.trim(); state.sid = $('sid').value.trim(); state.name = $('nm').value.trim();
+  if(!state.cls || !state.sid || !state.name){ state.cls=state.sid=state.name=''; return; }
   const rd=round(bank[state.qi]); rd.phase='running'; rd.start=Date.now(); persist(); renderNav(); renderControls(); $('guess').focus();
 });
 $('guess').addEventListener('input', ()=>{ round(bank[state.qi]).text=$('guess').value; persist(); renderControls(); });
