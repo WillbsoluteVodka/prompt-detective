@@ -1303,7 +1303,8 @@ async function saveScore(q, rd){
   if(rd.saved) return; rd.saved = true;
   const r = rd.res, pct = x => Math.round(x*100);
   try{
-    await fetch(SB_URL+'/rest/v1/scores',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,Prefer:'return=minimal'},
+    // 同一学生同一题重复提交时覆盖旧记录
+    await fetch(SB_URL+'/rest/v1/scores?on_conflict=week,class_name,student_name,question_id',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,Prefer:'return=minimal,resolution=merge-duplicates'},
       body:JSON.stringify({week:WEEK, class_name:state.cls, student_name:state.name, question_id:q.id, score:r.total, sem:pct(r.sem), elem:pct(r.elem), len:pct(r.len), time_ms:rd.time, answer:rd.text})});
   }catch(e){ rd.saved=false; }
 }
