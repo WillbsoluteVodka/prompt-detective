@@ -2357,8 +2357,8 @@ const $ = id => document.getElementById(id);
 
 /* ---------- 状态 ---------- */
 let state = {qi:0, rounds:{}, revealed:{}, cls:'', name:''};
-// 会话保存在 localStorage，2 小时内刷新不用重新登录，进度也保留
-const SESSION_KEY = 'prompt-detective-session', SESSION_TTL = 2*60*60*1000;
+// 会话保存在 localStorage，7 天内不用重新登录，进度也保留
+const SESSION_KEY = 'prompt-detective-session', SESSION_TTL = 7*24*60*60*1000;
 try{
   const saved = JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
   if(saved && Date.now()-saved.at < SESSION_TTL){
