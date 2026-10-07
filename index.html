@@ -54,10 +54,6 @@ textarea{display:block;width:100%;min-height:22vh;resize:vertical;padding:10px 1
 .link{text-decoration:underline;text-underline-offset:3px}
 
 #results{margin-top:36px;padding-top:20px;border-top:1px solid var(--line)}
-#reveal{width:min(900px,calc(100vw - 40px));max-height:calc(100vh - 80px);overflow:auto;margin:auto;padding:clamp(24px,3vw,48px);border:1px solid var(--ink);background:var(--bg);color:var(--ink)}
-#reveal::backdrop{background:rgba(0,0,0,.6)}
-#reveal .head{display:flex;justify-content:space-between;align-items:baseline;gap:20px}
-#origPrompt{font-size:clamp(20px,1.8vw,32px)!important}
 .score{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 28px}
 .score b{font:700 clamp(44px,4.5vw,80px)/1 var(--mono);font-variant-numeric:tabular-nums}
 ul{list-style:none;margin:16px 0 0;padding:0}
@@ -65,8 +61,6 @@ li{display:flex;gap:10px;padding-block:3px}
 li .mark{flex:none;width:1.2em;font-weight:700}
 .hit{color:var(--good)} .near{color:var(--warn)} .miss{color:var(--bad)}
 .note{margin:14px 0 0;color:var(--muted)}
-#origPrompt{font:1em/1.7 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0 0}
-#refList li{font:.85em/1.6 var(--mono);color:var(--muted);overflow-wrap:anywhere}
 
 
 @media (max-width:680px){
@@ -97,13 +91,6 @@ li .mark{flex:none;width:1.2em;font-weight:700}
 
   <div id="results" hidden><div id="res"></div></div>
 
-  <dialog id="reveal">
-    <div class="head"><div class="label">原 prompt</div><button class="link" id="closeReveal">关闭</button></div>
-    <p id="origPrompt"></p>
-    <ul id="revealEls"></ul>
-    <div class="label" style="margin-top:20px">同样算对的写法</div>
-    <ul id="refList" style="margin-top:0"></ul>
-  </dialog>
 </main>
 
 <div id="shade">
@@ -1417,8 +1404,8 @@ function renderControls(){
   const done = rd.phase==='done';
   $('guess').disabled = rd.phase!=='running';
   $('submit').disabled = !done && (rd.phase!=='running' || units($('guess').value) < 3);
-  $('submit').textContent = done ? '揭晓答案' : '提交';
-  $('submit').hidden = done && !bank.every(x=>round(x).phase==='done');
+  $('submit').textContent = '提交';
+  $('submit').hidden = done;
   renderTimes();
 }
 function renderResults(){
@@ -1441,7 +1428,7 @@ function renderResult(el, q, r, text, time){
   el.innerHTML = `<div class="score"><b>${r.total}</b><span class="muted num">用时 ${fmt(time)} · 语义 ${pct(r.sem)} · 要素 ${pct(r.elem)} · 简洁 ${pct(r.len)}</span></div><ul>` +
     q.elements.map((e,i)=>{
       const h = r.hits[i], cls = h===1?'hit':h>0?'near':'miss', mark = h===1?'✓':h>0?'◐':'✗';
-      return `<li><span class="mark ${cls}">${mark}</span><span>${esc(e.label)}${(h===1||rev)?` <span class="muted">${esc(e.desc)}</span>`:''}</span></li>`;
+      return `<li><span class="mark ${cls}">${mark}</span><span>${esc(e.label)}${h===1?` <span class="muted">${esc(e.desc)}</span>`:''}</span></li>`;
     }).join('') + `</ul><p class="note">${tips.join(' ')}</p>`;
 }
 
@@ -1457,7 +1444,6 @@ $('startForm').addEventListener('submit', e=>{
 $('guess').addEventListener('input', ()=>{ round(bank[state.qi]).text=$('guess').value; persist(); renderControls(); });
 $('submit').addEventListener('click', async ()=>{
   const q = bank[state.qi], rd = round(q);
-  if(rd.phase==='done'){ openReveal(q); return; }
   rd.time = Date.now()-rd.start; rd.text = $('guess').value.trim();
   rd.res = await scoreGuess(q, rd.text); rd.phase = 'done';
   saveScore(q, rd);
@@ -1468,17 +1454,7 @@ $('submit').addEventListener('click', async ()=>{
   if(target>=0){ state.qi = target; const nr=round(bank[target]); nr.phase='running'; nr.start=Date.now(); }
   persist(); renderQuestion();
 });
-function openReveal(q){
-  state.revealed[q.id] = true; persist();
-  $('origPrompt').textContent = q.prompt;
-  $('revealEls').innerHTML = q.elements.map(e=>`<li><span class="muted">${esc(e.label)} ×${e.weight}</span><span>${esc(e.desc)}</span></li>`).join('');
-  $('refList').innerHTML = q.refs.map(r=>`<li>${esc(r)}</li>`).join('');
-  renderResults();
-  $('reveal').showModal();
-}
 $('logout').addEventListener('click', ()=>{ try{localStorage.removeItem(SESSION_KEY);}catch(e){} location.reload(); });
-$('closeReveal').addEventListener('click', ()=>$('reveal').close());
-$('reveal').addEventListener('click', e=>{ if(e.target===$('reveal')) $('reveal').close(); });
 setInterval(renderTimes, 100);
 
 if(state.name){ const rd=round(bank[state.qi]); if(rd.phase==='idle'){ rd.phase='running'; rd.start=Date.now(); } }
