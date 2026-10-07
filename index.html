@@ -38,15 +38,15 @@ button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:p
 .content.mono{font-family:var(--mono);font-size:clamp(17px,1.5vw,28px)}
 .content svg,.content img{display:block;width:100%;height:auto;max-height:48vh;object-fit:contain}
 
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:0 48px}
-.pair>div{min-width:0}
 #answers{margin-top:36px}
-#answers .who{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
-#answers label{font-weight:700}
-#answers .primary{margin-top:12px}
+.who{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+label{font-weight:700}
+#submit{margin-top:12px}
 textarea:disabled{opacity:.55}
 #shade{position:fixed;inset:0;z-index:10;display:grid;place-items:center;background:color-mix(in srgb,var(--bg) 85%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
-#shade .primary{font-size:clamp(28px,3vw,52px);padding:.5em 1.6em}
+#startForm{display:flex;flex-direction:column;gap:14px;width:min(420px,calc(100vw - 40px))}
+#startForm input{font:1.2em var(--sans);padding:12px 14px;border:1px solid var(--ink);border-radius:0;background:var(--bg);color:var(--ink)}
+#startForm .primary{font-size:1.4em;padding:.5em}
 textarea{display:block;width:100%;min-height:22vh;resize:vertical;padding:10px 12px;border:1px solid var(--ink);border-radius:0;background:var(--bg);color:var(--ink);font:1em/1.6 var(--mono)}
 .row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;margin-top:12px}
 .primary{background:var(--ink);color:var(--bg);padding:8px 20px;font-weight:700}
@@ -71,7 +71,6 @@ li .mark{flex:none;width:1.2em;font-weight:700}
 
 @media (max-width:680px){
   .stage{grid-template-columns:1fr}
-  .pair{grid-template-columns:1fr;gap:24px}
   .stage>div:first-child{padding-right:0}
   .stage>div:last-child{padding-left:0;border-left:none;border-top:1px solid var(--line);margin-top:20px;padding-top:20px}
 }
@@ -89,23 +88,13 @@ li .mark{flex:none;width:1.2em;font-weight:700}
     <div><div class="label">输出</div><div class="content" id="rightPane"></div></div>
   </div>
 
-  <div class="pair" id="answers">
-    <div>
-      <div class="who"><label for="guessA">学生 A</label><span class="muted num" id="timeA"></span></div>
-      <textarea id="guessA"></textarea>
-      <button class="primary" id="submitA">提交</button>
-    </div>
-    <div>
-      <div class="who"><label for="guessB">学生 B</label><span class="muted num" id="timeB"></span></div>
-      <textarea id="guessB"></textarea>
-      <button class="primary" id="submitB">提交</button>
-    </div>
+  <div id="answers">
+    <div class="who"><label for="guess">你猜的 prompt</label><span class="muted num" id="time"></span></div>
+    <textarea id="guess"></textarea>
+    <button class="primary" id="submit">提交</button>
   </div>
 
-  <div class="pair" id="results" hidden>
-    <div id="resA"></div>
-    <div id="resB"></div>
-  </div>
+  <div id="results" hidden><div id="res"></div></div>
 
   <dialog id="reveal">
     <div class="head"><div class="label">原 prompt</div><button class="link" id="closeReveal">关闭</button></div>
@@ -116,7 +105,13 @@ li .mark{flex:none;width:1.2em;font-weight:700}
   </dialog>
 </main>
 
-<div id="shade"><button class="primary" id="startBtn">开始</button></div>
+<div id="shade">
+  <form id="startForm">
+    <input id="cls" placeholder="班级" autocomplete="off" required>
+    <input id="nm" placeholder="姓名" autocomplete="off" required>
+    <button class="primary" id="startBtn" type="submit">开始</button>
+  </form>
+</div>
 
 <!-- 占位图：之后可以在题库里用 leftImg / rightImg 换成真实图片的 URL 或 data URI -->
 <template id="svg-house-day"><svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="220" fill="#9fd3f5"/><circle cx="262" cy="46" r="24" fill="#ffd44d"/><ellipse cx="80" cy="50" rx="34" ry="12" fill="#fff"/><ellipse cx="170" cy="32" rx="26" ry="9" fill="#fff"/><rect y="160" width="320" height="60" fill="#6cbf5a"/><rect x="110" y="100" width="110" height="80" fill="#e8c9a0"/><polygon points="98,102 165,52 232,102" fill="#b5482f"/><rect x="155" y="135" width="24" height="45" fill="#6b4226"/><rect x="122" y="115" width="24" height="22" fill="#4a6d8c"/><rect x="188" y="115" width="24" height="22" fill="#4a6d8c"/><rect x="52" y="120" width="10" height="50" fill="#6b4226"/><circle cx="57" cy="108" r="26" fill="#3f9142"/></svg></template>
@@ -2360,10 +2355,20 @@ const W = {sem:.35, elem:.45, len:.20};
 const $ = id => document.getElementById(id);
 
 /* ---------- 状态 ---------- */
-let state = {qi:0, rounds:{}, revealed:{}};
-const WHO = ['A','B'];
-// 每题一轮：phase idle → running → done；两人各自提交，都提交后才评分
-const round = q => state.rounds[q.id] || (state.rounds[q.id] = {phase:'idle', start:0, text:{}, time:{}, res:null});
+let state = {qi:0, rounds:{}, revealed:{}, cls:'', name:''};
+// 每题一轮：phase idle → running → done
+const round = q => state.rounds[q.id] || (state.rounds[q.id] = {phase:'idle', start:0, text:'', time:null, res:null, saved:false});
+
+/* ---------- Supabase ---------- */
+const SB_URL = 'https://rvjcamuuroewqhlgdhag.supabase.co', SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2amNhbXV1cm9ld3FobGdkaGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMTg5MDMsImV4cCI6MjEwNjg5NDkwM30.PL_7zX1lkI0mnySonGNkqUDzDw8njzTQ3SmYqJzJlPA';
+async function saveScore(q, rd){
+  if(rd.saved) return; rd.saved = true;
+  const r = rd.res, pct = x => Math.round(x*100);
+  try{
+    await fetch(SB_URL+'/rest/v1/scores',{method:'POST',headers:{'Content-Type':'application/json',apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,Prefer:'return=minimal'},
+      body:JSON.stringify({class_name:state.cls, student_name:state.name, question_id:q.id, score:r.total, sem:pct(r.sem), elem:pct(r.elem), len:pct(r.len), time_ms:rd.time, answer:rd.text})});
+  }catch(e){ rd.saved=false; }
+}
 
 /* ---------- 向量引擎 ---------- */
 // 默认：字符 n-gram 词袋向量（中文单字+双字，英文单词），sqrt-TF，余弦相似度
@@ -2457,35 +2462,31 @@ function fillPane(el, q, side){
 }
 function renderNav(){
   $('nav').innerHTML = bank.map((q,i)=>`<button data-i="${i}" aria-current="${i===state.qi}">${i+1}</button>`).join('');
-  const sum = i => bank.reduce((a,q)=>{ const r=round(q).res; return a+(r?r[i].total:0); },0);
-  $('totalScore').textContent = `A ${sum(0)} · B ${sum(1)}`;
+  const sum = bank.reduce((a,q)=>{ const r=round(q).res; return a+(r?r.total:0); },0);
+  $('totalScore').textContent = (state.name? state.cls+' '+state.name+' · ':'') + sum;
 }
 function renderTimes(){
   const rd = round(bank[state.qi]);
-  WHO.forEach(w=>{
-    $('time'+w).textContent = rd.time[w]!=null ? fmt(rd.time[w]) : rd.phase==='running' ? fmt(Date.now()-rd.start) : '';
-  });
+  $('time').textContent = rd.time!=null ? fmt(rd.time) : rd.phase==='running' ? fmt(Date.now()-rd.start) : '';
 }
 function renderControls(){
-  const q = bank[state.qi], rd = round(q), rev = !!state.revealed[q.id];
+  const q = bank[state.qi], rd = round(q);
   $('shade').hidden = rd.phase!=='idle';
-  WHO.forEach(w=>{
-    const sent = rd.time[w]!=null, done = rd.phase==='done';
-    $('guess'+w).disabled = sent || rd.phase!=='running';
-    $('submit'+w).disabled = !done && (sent || rd.phase!=='running' || units($('guess'+w).value) < 3);
-    $('submit'+w).textContent = done ? '揭晓答案' : sent ? '已提交，等待对方' : '提交';
-  });
+  const done = rd.phase==='done';
+  $('guess').disabled = rd.phase!=='running';
+  $('submit').disabled = !done && (rd.phase!=='running' || units($('guess').value) < 3);
+  $('submit').textContent = done ? '揭晓答案' : '提交';
   renderTimes();
 }
 function renderResults(){
   const q = bank[state.qi], rd = round(q);
   $('results').hidden = !rd.res;
-  if(rd.res) WHO.forEach((w,i)=>renderResult($('res'+w), q, rd.res[i], rd.text[w], rd.time[w]));
+  if(rd.res) renderResult($('res'), q, rd.res, rd.text, rd.time);
 }
 function renderQuestion(){
   const q = bank[state.qi], rd = round(q);
   fillPane($('leftPane'), q, 'left'); fillPane($('rightPane'), q, 'right');
-  WHO.forEach(w=>{ $('guess'+w).value = rd.text[w]||''; });
+  $('guess').value = rd.text||'';
   renderNav(); renderControls(); renderResults();
 }
 function renderResult(el, q, r, text, time){
@@ -2501,21 +2502,21 @@ function renderResult(el, q, r, text, time){
 }
 
 /* ---------- 事件 ---------- */
-$('nav').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return; state.qi=+b.dataset.i; renderQuestion(); });
-$('startBtn').addEventListener('click', ()=>{ const rd=round(bank[state.qi]); rd.phase='running'; rd.start=Date.now(); renderControls(); $('guessA').focus(); });
-WHO.forEach(w=>{
-  $('guess'+w).addEventListener('input', ()=>{ round(bank[state.qi]).text[w]=$('guess'+w).value; renderControls(); });
-  $('submit'+w).addEventListener('click', async ()=>{
-    const q = bank[state.qi], rd = round(q);
-    if(rd.phase==='done'){ openReveal(q); return; }
-    rd.time[w] = Date.now()-rd.start;
-    rd.text[w] = $('guess'+w).value.trim();
-    if(WHO.every(x=>rd.time[x]!=null)){
-      rd.res = await Promise.all(WHO.map(x=>scoreGuess(q, rd.text[x])));
-      rd.phase = 'done';
-    }
-    if(bank[state.qi]===q){ renderNav(); renderControls(); renderResults(); }
-  });
+$('nav').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return; state.qi=+b.dataset.i; const rd=round(bank[state.qi]); if(state.name && rd.phase==='idle'){ rd.phase='running'; rd.start=Date.now(); } renderQuestion(); });
+$('startForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  state.cls = $('cls').value.trim(); state.name = $('nm').value.trim();
+  if(!state.cls || !state.name) return;
+  const rd=round(bank[state.qi]); rd.phase='running'; rd.start=Date.now(); renderNav(); renderControls(); $('guess').focus();
+});
+$('guess').addEventListener('input', ()=>{ round(bank[state.qi]).text=$('guess').value; renderControls(); });
+$('submit').addEventListener('click', async ()=>{
+  const q = bank[state.qi], rd = round(q);
+  if(rd.phase==='done'){ openReveal(q); return; }
+  rd.time = Date.now()-rd.start; rd.text = $('guess').value.trim();
+  rd.res = await scoreGuess(q, rd.text); rd.phase = 'done';
+  saveScore(q, rd);
+  if(bank[state.qi]===q){ renderNav(); renderControls(); renderResults(); }
 });
 function openReveal(q){
   state.revealed[q.id] = true;
